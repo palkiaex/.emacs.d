@@ -134,6 +134,13 @@
   ;; Keep the echo area from resizing aggressively and causing visual jumping
   (setq eldoc-echo-area-use-multiline-p nil))
 
+;; Force *eldoc* (and other help buffers if you want) to open on the right
+(add-to-list 'display-buffer-alist
+             '("^\\*eldoc\\*"
+               (display-buffer-in-direction)
+               (direction . right)
+               (window-width . 0.4))) ;; Takes up 40% of the frame width
+
 ; (use-package eldoc
 ;   :ensure nil
 ;   :custom
@@ -178,3 +185,50 @@
   (evil-define-key 'normal flymake-mode-map
     (kbd "]d") #'flymake-goto-next-error
     (kbd "[d") #'flymake-goto-prev-error))
+
+(use-package prism
+  :ensure t
+  ;; Optional: If you also want prism to color your code text, uncomment this:
+  ;; :hook (prog-mode . prism-mode)
+  )
+
+(use-package indent-bars
+  :ensure t
+  :after prism
+  :custom
+  ;; 1. Core & Tree-sitter settings
+  (indent-bars-treesit-support t)
+  (indent-bars-no-descend-string t)
+  (indent-bars-treesit-scope '((rust function_item impl_item trait_item struct_item enum_item block)))
+
+  ;; 2. Visual Style (Matched to screenshot)
+  (indent-bars-width-frac 0.1)           ; Found at the bottom left of the image
+  (indent-bars-pattern nil)             ; Found in the "Indent Bars Pattern" field
+
+  ;; 3. Depth Coloring (Matched to screenshot)
+  ;; Note: This requires the 'prism' package/faces to be loaded in your Emacs.
+  (indent-bars-color-by-depth
+   '(:palette (prism-level-1
+               prism-level-2
+               prism-level-3
+               prism-level-4
+               prism-level-5
+               prism-level-6
+               prism-level-7
+               prism-level-8)
+     :blend 0.9))                        ; Blend fraction set to 0.9
+
+  ;; 4. Highlight settings
+  (indent-bars-highlight-selection-method 'context) ; Set to 'Context' in image
+  (indent-bars-highlight-current-depth nil)
+
+  :hook 
+  ;; Enable it in rustic-mode (and yaml-mode, since your screenshot is Ansible/YAML!)
+  ((rustic-mode . indent-bars-mode)
+   (yaml-mode . indent-bars-mode) 
+   
+   ;; CRITICAL: rustic-mode does not automatically start the treesitter parser. 
+   ;; We must initialize it manually so indent-bars can read the Rust AST for scope.
+   (rustic-mode . (lambda ()
+                    (when (treesit-available-p)
+                      (treesit-parser-create 'rust))))))

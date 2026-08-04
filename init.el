@@ -65,6 +65,7 @@
   (rustic-cargo-use-last-stored-arguments t))
 
 ;; If you want to turn off the welcome screen, uncomment this
+(menu-bar-mode -1)
 (setopt inhibit-splash-screen t)
 
 (setopt initial-major-mode 'fundamental-mode)  ; default mode for the *scratch* buffer
@@ -297,15 +298,14 @@ If the new path's directories does not exist, create them."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   '("0f1341c0096825b1e5d8f2ed90996025a0d013a0978677956a9e61408fcd2c77"
+   '("4594d6b9753691142f02e67b8eb0fda7d12f6cc9f1299a49b819312d6addad1d"
+     "e8bd9bbf6506afca133125b0be48b1f033b1c8647c628652ab7a2fe065c10ef0"
+     "0f1341c0096825b1e5d8f2ed90996025a0d013a0978677956a9e61408fcd2c77"
      "f1e8339b04aef8f145dd4782d03499d9d716fdc0361319411ac2efc603249326"
      "21d2bf8d4d1df4859ff94422b5e41f6f2eeff14dd12f01428fa3cb4cb50ea0fb"
      "d97ac0baa0b67be4f7523795621ea5096939a47e8b46378f79e78846e0e4ad3d"
      default))
- '(package-selected-packages
-   '(avy cape corfu-terminal eat embark-consult evil json-mode kind-icon
-	 lsp-mode magit marginalia orderless rustic tempel vertico
-	 wgrep yaml-mode)))
+ '(package-selected-packages nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -319,5 +319,28 @@ If the new path's directories does not exist, create them."
 ;; 2. Increase how much data Emacs reads from rust-analyzer at once
 (setq read-process-output-max (* 3 1024 1024))
 
-(set-face-attribute 'default nil :font "JetBrainsMono Nerd Font" :height 140 :weight 'normal)
-(setq-default line-spacing 0.2)
+;; 1. Define the font size based on the operating system
+(defvar my-font-size
+  (cond ((eq system-type 'darwin) 140)     ; macOS: Size 14
+        ((eq system-type 'windows-nt) 105) ; Windows: Size 13
+        (t 140)))                          ; Linux/Other: Size 14 (default)
+
+;; 2. Safely set the font using the OS-specific size
+(let ((my-font "JetBrainsMono NF")) 
+  ;; Use :family instead of :name for better matching
+  (when (find-font (font-spec :family my-font))
+    (set-face-attribute 'default nil 
+                        :family my-font      ;; <--- CHANGED from :font to :family
+                        :height my-font-size 
+                        :weight 'normal)))(setq-default line-spacing 0.2)
+
+(use-package compile
+  :ensure nil
+  :custom
+  ;; Optional but highly recommended: auto-scroll the compilation buffer
+  (compilation-scroll-output t)
+  :config
+  ;; Load the built-in ansi-color package
+  (require 'ansi-color)
+  ;; Apply the color filter to the compilation buffer
+  (add-hook 'compilation-filter-hook 'ansi-color-compilation-filter))
