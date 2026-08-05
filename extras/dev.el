@@ -1,27 +1,3 @@
-;;; Emacs Bedrock
-;;;
-;;; Extra config: Development tools
-
-;;; Usage: Append or require this file from init.el for some software
-;;; development-focused packages.
-;;;
-;;; It is **STRONGLY** recommended that you use the base.el config if you want to
-;;; use Eglot. Lots of completion things will work better.
-;;;
-;;; This will try to use tree-sitter modes for many languages. Please run
-;;;
-;;;   M-x treesit-install-language-grammar
-;;;
-;;; Before trying to use a treesit mode.
-
-;;; Contents:
-;;;
-;;;  - Built-in config for developers
-;;;  - Version Control
-;;;  - Common file types
-;;;  - Eglot, the built-in LSP client for Emacs
-;;;  - Templating
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
 ;;;   Built-in config for developers
@@ -31,7 +7,6 @@
 (use-package emacs
   :config
   ;; Treesitter config
-
   ;; Tell Emacs to prefer the treesitter mode
   ;; You'll want to run the command `M-x treesit-install-language-grammar' before editing.
   (setq major-mode-remap-alist
@@ -48,8 +23,7 @@
 
 (use-package project
   :custom
-  (when (>= emacs-major-version 30)
-    (project-mode-line t)))         ; show project name in modeline
+  (project-mode-line (if (>= emacs-major-version 30) t nil)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
@@ -57,7 +31,7 @@
 ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Magit: best Git client to ever exist
+;; Magit: slowest Git client to ever exist
 (use-package magit
   :ensure t
   :bind (("C-x g" . magit-status)))
@@ -78,9 +52,13 @@
 (use-package json-mode
   :ensure t)
 
-;; Emacs ships with a lot of popular programming language modes. If it's not
-;; built in, you're almost certain to find a mode for the language you're
-;; looking for with a quick Internet search.
+(use-package rustic
+  :ensure t
+  :config
+  (setq rustic-format-on-save t)
+  (setq rustic-lsp-client 'eglot)
+  :custom
+  (rustic-cargo-use-last-stored-arguments t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
@@ -151,84 +129,28 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
-;;;   Templating
+;;;   Other useful stuffs
 ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(use-package tempel
-  :ensure t
-  ;; By default, tempel looks at the file "templates" in
-  ;; user-emacs-directory, but you can customize that with the
-  ;; tempel-path variable:
-  ;; :custom
-  ;; (tempel-path (concat user-emacs-directory "custom_template_file"))
-  :bind (("M-*" . tempel-insert)
-         ("M-+" . tempel-complete)
-         :map tempel-map
-         ("C-c RET" . tempel-done)
-         ("C-<down>" . tempel-next)
-         ("C-<up>" . tempel-previous)
-         ("M-<down>" . tempel-next)
-         ("M-<up>" . tempel-previous))
-  :init
-  ;; Make a function that adds the tempel expansion function to the
-  ;; list of completion-at-point-functions (capf).
-  (defun tempel-setup-capf ()
-    (add-hook 'completion-at-point-functions #'tempel-expand -1 'local))
-  ;; Put tempel-expand on the list whenever you start programming or
-  ;; writing prose.
-  (add-hook 'prog-mode-hook 'tempel-setup-capf)
-  (add-hook 'text-mode-hook 'tempel-setup-capf))
-
+;; Fast diagnostic navigation
 (with-eval-after-load 'flymake
-  ;; Bind ]d and [d only in Evil's Normal state when flymake is active
   (evil-define-key 'normal flymake-mode-map
     (kbd "]d") #'flymake-goto-next-error
     (kbd "[d") #'flymake-goto-prev-error))
 
-(use-package prism
-  :ensure t
-  ;; Optional: If you also want prism to color your code text, uncomment this:
-  ;; :hook (prog-mode . prism-mode)
-  )
-
+;; Indent guideline for tree-sitter scope
 (use-package indent-bars
   :ensure t
-  :after prism
   :custom
-  ;; 1. Core & Tree-sitter settings
-  (indent-bars-treesit-support t)
-  (indent-bars-no-descend-string t)
-  (indent-bars-treesit-scope '((rust function_item impl_item trait_item struct_item enum_item block)))
-
-  ;; 2. Visual Style (Matched to screenshot)
-  (indent-bars-width-frac 0.1)           ; Found at the bottom left of the image
-  (indent-bars-pattern nil)             ; Found in the "Indent Bars Pattern" field
-
-  ;; 3. Depth Coloring (Matched to screenshot)
-  ;; Note: This requires the 'prism' package/faces to be loaded in your Emacs.
-  (indent-bars-color-by-depth
-   '(:palette (prism-level-1
-               prism-level-2
-               prism-level-3
-               prism-level-4
-               prism-level-5
-               prism-level-6
-               prism-level-7
-               prism-level-8)
-     :blend 0.9))                        ; Blend fraction set to 0.9
-
-  ;; 4. Highlight settings
-  (indent-bars-highlight-selection-method 'context) ; Set to 'Context' in image
+  (indent-bars-prefer-character t)
   (indent-bars-highlight-current-depth nil)
-
+  (indent-bars-treesit-support t)
+  (indent-bars-treesit-scope '((rust function_item impl_item trait_item struct_item enum_item block)))
   :hook 
-  ;; Enable it in rustic-mode (and yaml-mode, since your screenshot is Ansible/YAML!)
   ((rustic-mode . indent-bars-mode)
-   (yaml-mode . indent-bars-mode) 
-   
-   ;; CRITICAL: rustic-mode does not automatically start the treesitter parser. 
-   ;; We must initialize it manually so indent-bars can read the Rust AST for scope.
    (rustic-mode . (lambda ()
                     (when (treesit-available-p)
                       (treesit-parser-create 'rust))))))
+
+
