@@ -87,9 +87,9 @@
 
 ;; Force *eldoc* to open on the right
 (add-to-list 'display-buffer-alist
-             '("^\\*eldoc\\*"
-               (display-buffer-in-direction)
-               (direction . right)
+             '("^\\*eldoc.*\\*$" 
+               (display-buffer-in-direction) 
+               (direction . right) 
                (window-width . 0.4)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
