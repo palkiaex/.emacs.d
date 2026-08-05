@@ -1,9 +1,18 @@
 (when (< emacs-major-version 29)
   (error "Emacs Bedrock only works with Emacs 29 and newer; you have version %s" emacs-major-version))
 
-(setq gc-cons-threshold (* 50 1024 1024))
-(setq gc-cons-percentage 1)
-(setq read-process-output-max (* 3 1024 1024))
+;; 1. Increase read size for rust-analyzer's massive JSON responses
+(setq read-process-output-max (* 3 1024 1024)) ;; 3 MB
+
+;; 2. Smart Garbage Collection
+(use-package gcmh
+  :ensure t
+  :demand t
+  :custom
+  (gcmh-idle-delay 1.0)
+  (gcmh-high-cons-threshold (* 100 1024 1024))
+  :config
+  (gcmh-mode 1))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
@@ -45,6 +54,9 @@
 ;; Make right-click do something sensible
 (when (display-graphic-p)
   (context-menu-mode))
+
+;; Stop Dired from opening too many buffers
+(setq dired-kill-when-opening-new-dired-buffers t)
 
 ;; Don't litter file system with *~ backup files; put them all inside
 ;; ~/.emacs.d/backup or wherever
