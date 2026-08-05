@@ -1,13 +1,15 @@
 (when (< emacs-major-version 29)
   (error "Emacs Bedrock only works with Emacs 29 and newer; you have version %s" emacs-major-version))
 
+; (setq gc-cons-threshold (* 100 1024 1024))
+; (setq gc-cons-percentage 1)
+; (setq read-process-output-max (* 100 1024 1024))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
 ;;;   Basic settings
 ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(load-file (expand-file-name "extras/gcmh.el" user-emacs-directory))
-(gcmh-mode 1)
 
 (use-package package
   :ensure nil
