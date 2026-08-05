@@ -52,20 +52,13 @@
 (use-package json-mode
   :ensure t)
 
-;; Add the official rust-mode
 (use-package rust-mode
   :ensure t
   :init
-  ;; Tell rust-mode to use the new treesitter mode
   (setq rust-mode-treesitter-derive t)
   :custom
-  ;; Format on save
   (rust-format-on-save t)
-  ;; Force rustfmt to use the 2024 edition
-  (rust-rustfmt-switches '("--edition" "2024"))
-  :hook
-  ;; Automatically start Eglot LSP when entering rust-mode
-  (rust-mode . eglot-ensure))
+  (rust-rustfmt-switches '("--edition" "2024")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
@@ -73,10 +66,9 @@
 ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
 (use-package eglot
   :hook
-  (((rust-mode python-mode ruby-mode elixir-mode) . eglot-ensure))
+  ((rust-mode python-mode) . eglot-ensure)
   :custom
   (eglot-ignored-server-capabilities '(:inlayHintProvider))
   (eglot-send-changes-idle-time 0.1)
@@ -115,7 +107,6 @@
   (indent-bars-treesit-support t)
   (indent-bars-treesit-scope '((rust function_item impl_item trait_item struct_item enum_item block)))
   :hook 
-  ;; Swapped rustic-mode for rust-mode here
   ((rust-mode . indent-bars-mode)
    (rust-mode . (lambda ()
                   (when (treesit-available-p)
