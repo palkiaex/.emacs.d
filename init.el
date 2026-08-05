@@ -6,6 +6,8 @@
 ;;;   Basic settings
 ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(load-file (expand-file-name "extras/gcmh.el" user-emacs-directory))
+(gcmh-mode 1)
 
 (use-package package
   :ensure nil
@@ -178,13 +180,6 @@ If the new path's directories does not exist, create them."
 ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Optimize Garbage Collection for LSP
-(setq gc-cons-threshold (* 100 1024 1024)
-      gc-cons-percentage 0.1)
-
-;; Increase how much data Emacs reads from rust-analyzer at once
-(setq read-process-output-max (* 3 1024 1024))
-
 (use-package compile
   :ensure nil
   :custom
@@ -242,4 +237,3 @@ If the new path's directories does not exist, create them."
 ;; WARNING: need to customize things inside the elisp file before use! See
 ;; the file extras/org-intro.txt for help.
 (load-file (expand-file-name "extras/org.el" user-emacs-directory))
-

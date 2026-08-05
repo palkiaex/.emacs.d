@@ -2,19 +2,7 @@
 ;;;
 ;;; Extra config: Vim emulation
 
-;;; Usage: Append or require this file from init.el for bindings in Emacs.
-
-;;; Contents:
-;;;
-;;;  - Core Packages
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;;   Core Packages
-;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; Evil: vi emulation
+;;; Core package
 (use-package evil
   :ensure t
 
@@ -22,6 +10,7 @@
   (setq evil-respect-visual-line-mode t)
   (setq evil-undo-system 'undo-redo)
   (setq evil-want-C-u-scroll t)
+  (setq evil-want-keybinding nil)
 
   :config
   (evil-mode)
@@ -32,3 +21,58 @@
   ;; Configuring initial major mode for some modes
   (evil-set-initial-state 'eat-mode 'emacs)
   (evil-set-initial-state 'vterm-mode 'emacs))
+
+;;; Better key binding for evil
+(use-package evil-collection
+  :after evil
+  :ensure t
+  :config
+  (evil-collection-init))
+
+;;; Highlight yanked text
+(require 'pulse)
+(defun my-pulse-on-yank (beg end &rest _)
+  (pulse-momentary-highlight-region beg end 'highlight))
+
+(advice-add 'evil-yank :after #'my-pulse-on-yank)
+
+;;; Useful bindings
+(with-eval-after-load 'evil
+  (define-key evil-normal-state-map (kbd "g R") 'xref-find-references))
+;;; Emacs Bedrock
+;;;
+;;; Extra config: Vim emulation
+
+;;; Core package
+(use-package evil
+  :ensure t
+
+  :init
+  (setq evil-respect-visual-line-mode t)
+  (setq evil-undo-system 'undo-redo)
+  (setq evil-want-C-u-scroll t)
+  (setq evil-want-keybinding nil)
+
+  :config
+  (evil-mode)
+
+  ;; If you use Magit, start editing in insert state
+  (add-hook 'git-commit-setup-hook 'evil-insert-state)
+
+  ;; Configuring initial major mode for some modes
+  (evil-set-initial-state 'eat-mode 'emacs)
+  (evil-set-initial-state 'vterm-mode 'emacs))
+
+;;; Better key binding for evil
+(use-package evil-collection
+  :after evil
+  :ensure t
+  :config
+  (evil-collection-init))
+
+;;; Highlight yanked text
+(require 'pulse)
+(defun my-pulse-on-yank (beg end &rest _)
+  (pulse-momentary-highlight-region beg end 'highlight))
+
+(advice-add 'evil-yank :after #'my-pulse-on-yank)
