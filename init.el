@@ -1,9 +1,9 @@
 (when (< emacs-major-version 29)
   (error "Emacs Bedrock only works with Emacs 29 and newer; you have version %s" emacs-major-version))
 
-; (setq gc-cons-threshold (* 100 1024 1024))
-; (setq gc-cons-percentage 1)
-; (setq read-process-output-max (* 100 1024 1024))
+(setq gc-cons-threshold (* 50 1024 1024))
+(setq gc-cons-percentage 1)
+(setq read-process-output-max (* 3 1024 1024))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
@@ -22,9 +22,9 @@
 (setopt inhibit-splash-screen t)
 
 (setopt initial-major-mode 'fundamental-mode)  ; default mode for the *scratch* buffer
-(setopt display-time-default-load-average nil) ; this information is useless for most
-
-;; Automatically reread from disk if the underlying file changes
+(setopt display-time-default-load-average nil) ; this information is useless for mostly
+(display-time-mode -1)
+;; Automatically reread from disk if the unerlying file changes
 (setopt auto-revert-avoid-polling t)
 
 ;; Some systems don't do file notifications well; see

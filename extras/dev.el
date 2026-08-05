@@ -38,7 +38,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
-;;;   Common file types
+;;;   Common file types & Languages
 ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -52,13 +52,13 @@
 (use-package json-mode
   :ensure t)
 
-(use-package rustic
+;; Add the official rust-mode
+(use-package rust-mode
   :ensure t
-  :config
-  (setq rustic-format-on-save t)
-  (setq rustic-lsp-client 'eglot)
-  :custom
-  (rustic-cargo-use-last-stored-arguments t))
+  :init
+  (setq rust-mode-treesitter-derive t))
+(setq rust-format-on-save t)
+(add-hook 'rust-mode-hook 'eglot-ensure)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
@@ -70,7 +70,8 @@
 
 (use-package eglot
   :hook
-  (((rustic-mode python-mode ruby-mode elixir-mode) . eglot-ensure))
+  ;; Swapped rustic-mode for rust-mode here
+  (((rust-mode python-mode ruby-mode elixir-mode) . eglot-ensure))
   :custom
   (eglot-send-changes-idle-time 0.1)
   (eglot-extend-to-xref t)
@@ -118,9 +119,8 @@
   (indent-bars-treesit-support t)
   (indent-bars-treesit-scope '((rust function_item impl_item trait_item struct_item enum_item block)))
   :hook 
-  ((rustic-mode . indent-bars-mode)
-   (rustic-mode . (lambda ()
-                    (when (treesit-available-p)
-                      (treesit-parser-create 'rust))))))
-
-
+  ;; Swapped rustic-mode for rust-mode here
+  ((rust-mode . indent-bars-mode)
+   (rust-mode . (lambda ()
+                  (when (treesit-available-p)
+                    (treesit-parser-create 'rust))))))
