@@ -56,9 +56,16 @@
 (use-package rust-mode
   :ensure t
   :init
-  (setq rust-mode-treesitter-derive t))
-(setq rust-format-on-save t)
-(add-hook 'rust-mode-hook 'eglot-ensure)
+  ;; Tell rust-mode to use the new treesitter mode
+  (setq rust-mode-treesitter-derive t)
+  :custom
+  ;; Format on save
+  (rust-format-on-save t)
+  ;; Force rustfmt to use the 2024 edition
+  (rust-rustfmt-switches '("--edition" "2024"))
+  :hook
+  ;; Automatically start Eglot LSP when entering rust-mode
+  (rust-mode . eglot-ensure))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
@@ -103,12 +110,6 @@
 ;;;   Other useful stuffs
 ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; Fast diagnostic navigation
-(with-eval-after-load 'flymake
-  (evil-define-key 'normal flymake-mode-map
-    (kbd "]d") #'flymake-goto-next-error
-    (kbd "[d") #'flymake-goto-prev-error))
 
 ;; Indent guideline for tree-sitter scope
 (use-package indent-bars

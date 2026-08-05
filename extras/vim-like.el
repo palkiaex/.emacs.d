@@ -76,3 +76,9 @@
   (pulse-momentary-highlight-region beg end 'highlight))
 
 (advice-add 'evil-yank :after #'my-pulse-on-yank)
+
+;; Fast diagnostic navigation
+(with-eval-after-load 'flymake
+  (evil-define-key 'normal flymake-mode-map
+    (kbd "]d") #'flymake-goto-next-error
+    (kbd "[d") #'flymake-goto-prev-error))
