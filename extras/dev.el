@@ -73,32 +73,27 @@
 ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(setq eglot-ignored-server-capabilities '(:inlayHintProvider))
 
 (use-package eglot
   :hook
-  ;; Swapped rustic-mode for rust-mode here
   (((rust-mode python-mode ruby-mode elixir-mode) . eglot-ensure))
   :custom
+  (eglot-ignored-server-capabilities '(:inlayHintProvider))
   (eglot-send-changes-idle-time 0.1)
   (eglot-extend-to-xref t)
-
-  :config
-  (fset #'jsonrpc--log-event #'ignore))
-
-(with-eval-after-load 'eglot
-  (setq eglot-events-buffer-size 0)
-  ;; Tell Eglot to not block Emacs while Rust-analyzer is checking the code
-  (setq-default eglot-workspace-configuration
+  (eglot-events-buffer-size 0)
+  (eglot-workspace-configuration
                 '(:rust-analyzer (:checkOnSave (:enable t :command "clippy")
                                   :procMacro (:enable t)
-                                  :cargo (:buildScripts (:enable t))))))
+                                  :cargo (:buildScripts (:enable t)))))
+  :config
+  (fset #'jsonrpc--log-event #'ignore))
 
 (with-eval-after-load 'eldoc
   (setq eldoc-idle-delay 0.5)
   (setq eldoc-echo-area-use-multiline-p nil))
 
-;; Force *eldoc* (and other help buffers if you want) to open on the right
+;; Force *eldoc* to open on the right
 (add-to-list 'display-buffer-alist
              '("^\\*eldoc\\*"
                (display-buffer-in-direction)

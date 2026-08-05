@@ -215,7 +215,7 @@ If the new path's directories does not exist, create them."
   (load custom-file))
 
 (defvar my-font-size
-  (cond ((eq system-type 'darwin) 140) 
+  (cond ((eq system-type 'darwin) 145) 
         ((eq system-type 'windows-nt) 105)
         (t 140)))
 (let ((my-font "JetBrainsMono NF")) 
