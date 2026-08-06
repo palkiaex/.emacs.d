@@ -8,5 +8,6 @@
 /transient/
 /tree-sitter/
 /emacs-backup/
+/server/
 custom.el
 bookmarks
