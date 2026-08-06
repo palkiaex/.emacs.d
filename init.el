@@ -219,7 +219,7 @@ If the new path's directories does not exist, create them."
       (cond ((eq system-type 'darwin) 143) 
             ((eq system-type 'windows-nt) 105) 
             (t 140))) 
-(let ((my-font "CaskaydiaCove Nerd Font")) 
+(let ((my-font "CaskaydiaCove NF")) 
   (when (find-font (font-spec :family my-font)) 
     (set-face-attribute 'default nil 
                         :family my-font

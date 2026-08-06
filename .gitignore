@@ -7,5 +7,6 @@
 /projects
 /transient/
 /tree-sitter/
+/emacs-backup/
 custom.el
 bookmarks
