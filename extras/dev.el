@@ -16,7 +16,8 @@
           (typescript-mode . typescript-ts-mode)
           (json-mode . json-ts-mode)
           (css-mode . css-ts-mode)
-          (python-mode . python-ts-mode)))
+          (python-mode . python-ts-mode)
+	  (lua-mode . lua-ts-mode)))
   :hook
   ;; Auto parenthesis matching
   ((prog-mode . electric-pair-mode)))
@@ -52,6 +53,9 @@
 (use-package json-mode
   :ensure t)
 
+(use-package lua-mode
+  :ensure t)
+
 (use-package rust-mode
   :ensure t
   :init
@@ -68,7 +72,7 @@
 
 (use-package eglot
   :hook
-  ((rust-mode python-mode) . eglot-ensure)
+  ((rust-mode python-mode lua-ts-mode) . eglot-ensure)
   :custom
   (eglot-ignored-server-capabilities '(:inlayHintProvider))
   (eglot-send-changes-idle-time 0.1)
@@ -110,4 +114,7 @@
   ((rust-mode . indent-bars-mode)
    (rust-mode . (lambda ()
                   (when (treesit-available-p)
-                    (treesit-parser-create 'rust))))))
+                    (treesit-parser-create 'rust))))
+  (lua-ts-mode . (lambda ()
+                    (when (treesit-available-p)
+                      (treesit-parser-create 'lua))))))
