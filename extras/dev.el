@@ -108,10 +108,10 @@
 (use-package indent-bars
   :ensure t
   :custom
-  (indent-bars-prefer-character t)
   (indent-bars-highlight-current-depth nil)
   (indent-bars-treesit-support t)
   (indent-bars-treesit-scope '((rust function_item impl_item trait_item struct_item enum_item block)))
+  (indent-bars-prefer-character (eq system-type 'darwin))
   :hook 
   ((rust-mode . indent-bars-mode)
    (rust-mode . (lambda ()
@@ -120,3 +120,4 @@
   (lua-ts-mode . (lambda ()
                     (when (treesit-available-p)
                       (treesit-parser-create 'lua))))))
+
