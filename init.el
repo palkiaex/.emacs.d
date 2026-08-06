@@ -214,16 +214,17 @@ If the new path's directories does not exist, create them."
 (when (file-exists-p custom-file)
   (load custom-file))
 
-(defvar my-font-size
-  (cond ((eq system-type 'darwin) 140) 
-        ((eq system-type 'windows-nt) 105)
-        (t 140)))
-(let ((my-font "JetBrainsMono NF")) 
-  (when (find-font (font-spec :family my-font))
+(setq my-font-size 
+      (cond ((eq system-type 'darwin) 143) 
+            ((eq system-type 'windows-nt) 105) 
+            (t 140))) 
+(let ((my-font "CaskaydiaCove Nerd Font")) 
+  (when (find-font (font-spec :family my-font)) 
     (set-face-attribute 'default nil 
                         :family my-font
                         :height my-font-size 
-                        :weight 'normal)))(setq-default line-spacing 0.2)
+                        :weight 'normal)))
+(setq-default line-spacing 0.3)
 
 (use-package solarized-theme
   :ensure t)
@@ -231,6 +232,19 @@ If the new path's directories does not exist, create them."
 (use-package emacs
   :config
   (load-theme 'modus-vivendi))
+
+(defun my-toggle-theme ()
+  (interactive)
+  (if (memq 'solarized-light custom-enabled-themes)
+      (progn
+        (mapc #'disable-theme custom-enabled-themes)
+        (load-theme 'modus-vivendi t)
+        (message "Switched to Modus Vivendi (Dark)"))
+    (progn
+      (mapc #'disable-theme custom-enabled-themes)
+      (load-theme 'solarized-light t)
+      (message "Switched to Solarized (Light)"))))
+(global-set-key (kbd "C-c t") 'my-toggle-theme)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
@@ -251,3 +265,4 @@ If the new path's directories does not exist, create them."
 ;; WARNING: need to customize things inside the elisp file before use! See
 ;; the file extras/org-intro.txt for help.
 (load-file (expand-file-name "extras/org.el" user-emacs-directory))
+
