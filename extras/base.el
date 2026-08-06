@@ -1,3 +1,5 @@
+;;; ...  -*- lexical-binding: t -*-
+
 ;;; Emacs Bedrock
 ;;;
 ;;; Extra config: Base enhancements
@@ -121,6 +123,7 @@
   (corfu-auto t)               ;; <--- Enable auto-completion as you type
   (corfu-auto-delay 0.1)       ;; <--- How fast the popup appears (0.1 seconds)
   (corfu-auto-prefix 2)        ;; <--- How many characters to type before popping up
+  (corfu-quit-no-match t)
   :init
   (global-corfu-mode)
   :bind

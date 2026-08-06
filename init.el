@@ -1,3 +1,5 @@
+;;; -*- lexical-binding: t; -*-
+
 (when (< emacs-major-version 29)
   (error "Emacs Bedrock only works with Emacs 29 and newer; you have version %s" emacs-major-version))
 
@@ -29,10 +31,9 @@
 
 (menu-bar-mode -1)
 (setopt inhibit-splash-screen t)
-
 (setopt initial-major-mode 'fundamental-mode)  ; default mode for the *scratch* buffer
 (setopt display-time-default-load-average nil) ; this information is useless for mostly
-(display-time-mode -1)
+(setq mode-line-collapse-minor-modes t)
 ;; Automatically reread from disk if the unerlying file changes
 (setopt auto-revert-avoid-polling t)
 
@@ -264,5 +265,5 @@ If the new path's directories does not exist, create them."
 ;; Org-mode configuration
 ;; WARNING: need to customize things inside the elisp file before use! See
 ;; the file extras/org-intro.txt for help.
-(load-file (expand-file-name "extras/org.el" user-emacs-directory))
+;; (load-file (expand-file-name "extras/org.el" user-emacs-directory))
 
