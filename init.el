@@ -221,12 +221,17 @@ If the new path's directories does not exist, create them."
             (t 140))) 
 (let ((my-font "FiraCode Nerd Font")) 
   (when (find-font (font-spec :family my-font)) 
+    ;; 1. Set the default font
     (set-face-attribute 'default nil 
+                        :family my-font
+                        :height my-font-size 
+                        :weight 'normal)
+    ;; 2. Force the fixed-pitch font (used in eldoc code blocks) to match
+    (set-face-attribute 'fixed-pitch nil 
                         :family my-font
                         :height my-font-size 
                         :weight 'normal)))
 (setq-default line-spacing 0.3)
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
 ;;;   Unicode & Emoji Support
