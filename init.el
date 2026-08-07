@@ -227,6 +227,30 @@ If the new path's directories does not exist, create them."
                         :weight 'normal)))
 (setq-default line-spacing 0.3)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;;   Unicode & Emoji Support
+;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Force Emacs to use UTF-8 everywhere
+(prefer-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+
+;; Setup fallback fonts for Emojis and Symbols
+(when (fboundp 'set-fontset-font)
+  ;; Emacs will go down this list and use the first one available on your OS
+  (let ((emoji-fonts '("Apple Color Emoji"
+                       "Noto Color Emoji"
+                       "Segoe UI Emoji"
+                       "Symbola")))
+    (dolist (font emoji-fonts)
+      ;; Apply to the 'emoji and 'symbol character sets
+      (set-fontset-font t 'emoji (font-spec :family font) nil 'append)
+      (set-fontset-font t 'symbol (font-spec :family font) nil 'append))))
+
 (use-package solarized-theme
   :ensure t
   :init
