@@ -219,7 +219,7 @@ If the new path's directories does not exist, create them."
       (cond ((eq system-type 'darwin) 144) 
             ((eq system-type 'windows-nt) 105) 
             (t 140))) 
-(let ((my-font "BlexMono Nerd Font")) 
+(let ((my-font "FiraCode Nerd Font")) 
   (when (find-font (font-spec :family my-font)) 
     (set-face-attribute 'default nil 
                         :family my-font
@@ -228,11 +228,14 @@ If the new path's directories does not exist, create them."
 (setq-default line-spacing 0.3)
 
 (use-package solarized-theme
-  :ensure t)
+  :ensure t
+  :init
+  ;; Set solarized variables BEFORE the theme loads
+  (setq solarized-use-less-bold t))
 
 (use-package emacs
   :config
-  (load-theme 'modus-vivendi))
+  (load-theme 'solarized-wombat-dark))
 
 (defun my-toggle-theme ()
   (interactive)

@@ -66,12 +66,6 @@
   (rust-format-on-save t)
   (rust-rustfmt-switches '("--edition" "2024")))
 
-;; Force compilation/cargo buffers to open on the right at 40% width
-(add-to-list 'display-buffer-alist
-             '("^\\*\\(compilation\\|cargo.*\\|rust.*\\)\\*$"
-               (display-buffer-reuse-window display-buffer-in-direction)
-               (direction . right)
-               (window-width . 0.4)))
 (setq compilation-scroll-output 'first-error)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -100,13 +94,11 @@
   (setq eldoc-idle-delay 0.5)
   (setq eldoc-echo-area-use-multiline-p nil))
 
-;; Force *eldoc* to open on the right
 (add-to-list 'display-buffer-alist
-             '("^\\*eldoc.*\\*$" 
-               (display-buffer-in-direction) 
-               (direction . right) 
+             '("^\\*\\(compilation\\|cargo.*\\|rust.*\\|eldoc.*\\)\\*$"
+               (display-buffer-reuse-window display-buffer-in-side-window)
+               (side . right)
                (window-width . 0.4)))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
 ;;;   Other useful stuffs
