@@ -130,7 +130,7 @@ If the new path's directories does not exist, create them."
 ;; Mode line information
 (setopt line-number-mode t)                        ; Show current line in modeline
 (setopt column-number-mode t)                      ; Show column as well
-
+(global-visual-line-mode 1)
 (setopt x-underline-at-descent-line nil)           ; Prettier underlines
 (setopt switch-to-buffer-obey-display-actions t)   ; Make switching buffers more consistent
 
@@ -216,10 +216,10 @@ If the new path's directories does not exist, create them."
   (load custom-file))
 
 (setq my-font-size 
-      (cond ((eq system-type 'darwin) 143) 
+      (cond ((eq system-type 'darwin) 144) 
             ((eq system-type 'windows-nt) 105) 
             (t 140))) 
-(let ((my-font "CaskaydiaCove NF")) 
+(let ((my-font "BlexMono Nerd Font")) 
   (when (find-font (font-spec :family my-font)) 
     (set-face-attribute 'default nil 
                         :family my-font

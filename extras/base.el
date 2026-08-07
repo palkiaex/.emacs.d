@@ -1,34 +1,8 @@
 ;;; ...  -*- lexical-binding: t -*-
 
-;;; Emacs Bedrock
-;;;
-;;; Extra config: Base enhancements
-
-;;; Usage: Append or require this file from init.el to enable various UI/UX
-;;; enhancements.
-;;;
-;;; The consult package in particular has a vast number of functions that you
-;;; can use as replacements to what Emacs provides by default. Please see the
-;;; consult documentation for more information and help:
-;;;
-;;;     https://github.com/minad/consult
-;;;
-;;; In particular, many users may find `consult-line' to be more useful to them
-;;; than isearch, so binding this to `C-s' might make sense. This is left to the
-;;; user to configure, however, as isearch and consult-line are not equivalent.
-
-;;; Contents:
-;;;
-;;;  - Motion aids
-;;;  - Power-ups: Embark and Consult
-;;;  - Minibuffer and completion
-;;;  - Misc. editing enhancements
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;;   Motion aids
-;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                Motion aids
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package avy
   :ensure t
@@ -36,11 +10,9 @@
   :bind (("C-c j" . avy-goto-line)
          ("s-j"   . avy-goto-char-timer)))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;;   Power-ups: Embark and Consult
-;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;      Power-ups: Embark and Consult
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Consult: Misc. enhanced commands
 (use-package consult
@@ -116,55 +88,36 @@
   :config
   (marginalia-mode))
 
-;; Corfu: Popup completion-at-point
-(use-package corfu
+;; Company: The main autocompletion framework
+(use-package company
   :ensure t
   :custom
-  (corfu-auto t)               ;; <--- Enable auto-completion as you type
-  (corfu-auto-delay 0.1)       ;; <--- How fast the popup appears (0.1 seconds)
-  (corfu-auto-prefix 2)        ;; <--- How many characters to type before popping up
-  (corfu-quit-no-match t)
-  :init
-  (global-corfu-mode)
+  ;; ANTI-LAG: Wait 0.2 seconds before popping up to let you type fast
+  (company-idle-delay 0.2)
+  ;; How many characters to type before triggering
+  (company-minimum-prefix-length 2)
+  ;; Wrap around completions when reaching the end
+  (company-selection-wrap-around t)
+  ;; Align annotations (like variable types) to the right
+  (company-tooltip-align-annotations t)
+  :hook (after-init . global-company-mode)
   :bind
-  (:map corfu-map
-        ("SPC" . corfu-insert-separator)
-        ("C-n" . corfu-next)
-        ("C-p" . corfu-previous)))
+  (:map company-active-map
+        ("C-n" . company-select-next)
+        ("C-p" . company-select-previous)
+        ("TAB" . company-complete-selection)
+        ("<tab>" . company-complete-selection)
+        ("SPC" . nil))) ; Don't autocomplete on space!
 
-;; Part of corfu
-(use-package corfu-popupinfo
-  :after corfu
-  :ensure nil
-  :hook (corfu-mode . corfu-popupinfo-mode)
+;; Documentation popups for Company
+(use-package company-quickhelp
+  :ensure t
+  :after company
   :custom
-  (corfu-popupinfo-delay '(0.25 . 0.1))
-  (corfu-popupinfo-hide nil)
+  ;; ANTI-LAG: Wait 1 full second before asking LSP for documentation
+  (company-quickhelp-delay 1.0)
   :config
-  (corfu-popupinfo-mode))
-
-;; Make corfu popup come up in terminal overlay
-(use-package corfu-terminal
-  :if (not (display-graphic-p))
-  :ensure t
-  :config
-  (corfu-terminal-mode))
-
-;; Fancy completion-at-point functions; there's too much in the cape package to
-;; configure here; dive in when you're comfortable!
-(use-package cape
-  :ensure t
-  :init
-  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-  (add-to-list 'completion-at-point-functions #'cape-file))
-
-;; Pretty icons for corfu
-(use-package kind-icon
-  :if (display-graphic-p)
-  :ensure t
-  :after corfu
-  :config
-  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+  (company-quickhelp-mode 1))
 
 (use-package eshell
   :init
@@ -183,11 +136,12 @@
   (eat-eshell-mode)                     ; use Eat to handle term codes in program output
   (eat-eshell-visual-command-mode))     ; commands like less will be handled by Eat
 
-;; Orderless: powerful completion style
 (use-package orderless
   :ensure t
-  :config
-  (setq completion-styles '(orderless)))
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-overrides '((eglot (styles orderless))
+                                   (eglot-capf (styles orderless)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;

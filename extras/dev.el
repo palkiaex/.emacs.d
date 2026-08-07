@@ -66,6 +66,14 @@
   (rust-format-on-save t)
   (rust-rustfmt-switches '("--edition" "2024")))
 
+;; Force compilation/cargo buffers to open on the right at 40% width
+(add-to-list 'display-buffer-alist
+             '("^\\*\\(compilation\\|cargo.*\\|rust.*\\)\\*$"
+               (display-buffer-reuse-window display-buffer-in-direction)
+               (direction . right)
+               (window-width . 0.4)))
+(setq compilation-scroll-output 'first-error)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
 ;;;   Eglot, the built-in LSP client for Emacs
@@ -77,9 +85,10 @@
   ((rust-mode python-mode lua-ts-mode) . eglot-ensure)
   :custom
   (eglot-ignored-server-capabilities '(:inlayHintProvider))
-  (eglot-send-changes-idle-time 0.1)
+  (eglot-send-changes-idle-time 0.5)
   (eglot-extend-to-xref t)
   (eglot-events-buffer-size 0)
+  ;;(jsonrpc-events-buffer-size 0) 
   (eglot-workspace-configuration
                 '(:rust-analyzer (:checkOnSave (:enable t :command "clippy")
                                   :procMacro (:enable t)
@@ -105,19 +114,19 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Indent guideline for tree-sitter scope
-(use-package indent-bars
-  :ensure t
-  :custom
-  (indent-bars-highlight-current-depth nil)
-  (indent-bars-treesit-support t)
-  (indent-bars-treesit-scope '((rust function_item impl_item trait_item struct_item enum_item block)))
-  (indent-bars-prefer-character (eq system-type 'darwin))
-  :hook 
-  ((rust-mode . indent-bars-mode)
-   (rust-mode . (lambda ()
-                  (when (treesit-available-p)
-                    (treesit-parser-create 'rust))))
-  (lua-ts-mode . (lambda ()
-                    (when (treesit-available-p)
-                      (treesit-parser-create 'lua))))))
+;; (use-package indent-bars
+;;   :ensure t
+;;   :custom
+;;   (indent-bars-highlight-current-depth nil)
+;;   (indent-bars-treesit-support t)
+;;   (indent-bars-treesit-scope '((rust function_item impl_item trait_item struct_item enum_item block)))
+;;   (indent-bars-prefer-character (eq system-type 'darwin))
+;;   :hook 
+;;   ((rust-mode . indent-bars-mode)
+;;    (rust-mode . (lambda ()
+;;                   (when (treesit-available-p)
+;;                     (treesit-parser-create 'rust))))
+;;   (lua-ts-mode . (lambda ()
+;;                     (when (treesit-available-p)
+;;                       (treesit-parser-create 'lua))))))
 
