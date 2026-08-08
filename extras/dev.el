@@ -1,63 +1,54 @@
-;;; ...  -*- lexical-binding: t -*-
+;;; -*- lexical-binding: t -*-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;;   Built-in config for developers
-;;;
+;;; CORE DEV SETTINGS & TREE-SITTER
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package emacs
-  :config
-  ;; Treesitter config
-  ;; Tell Emacs to prefer the treesitter mode
-  ;; You'll want to run the command `M-x treesit-install-language-grammar' before editing.
-  (setq major-mode-remap-alist
-        '((yaml-mode . yaml-ts-mode)
-          (bash-mode . bash-ts-mode)
-          (js2-mode . js-ts-mode)
-          (typescript-mode . typescript-ts-mode)
-          (json-mode . json-ts-mode)
-          (css-mode . css-ts-mode)
-          (python-mode . python-ts-mode)
-	  (lua-mode . lua-ts-mode)))
+  :ensure nil
+  :custom
+  ;; Tell Emacs to prefer the treesitter mode for these languages.
+  ;; Note: Run `M-x treesit-install-language-grammar' before editing.
+  (major-mode-remap-alist
+   '((yaml-mode       . yaml-ts-mode)
+     (bash-mode       . bash-ts-mode)
+     (js2-mode        . js-ts-mode)
+     (typescript-mode . typescript-ts-mode)
+     (json-mode       . json-ts-mode)
+     (css-mode        . css-ts-mode)
+     (python-mode     . python-ts-mode)
+     (lua-mode        . lua-ts-mode)))
   :hook
   ;; Auto parenthesis matching
-  ((prog-mode . electric-pair-mode)))
+  (prog-mode . electric-pair-mode))
 
+;; Built-in project management
 (use-package project
+  :ensure nil
   :custom
   (project-mode-line (if (>= emacs-major-version 30) t nil)))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;;   Version Control
-;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; VERSION CONTROL
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Magit: slowest Git client to ever exist
+;; Magit: slowest Git client to ever exist (but we love it anyway)
 (use-package magit
   :ensure t
-  :bind (("C-x g" . magit-status)))
+  :bind 
+  (("C-x g" . magit-status)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;;   Common file types & Languages
-;;;
+;;; PROGRAMMING LANGUAGES
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package markdown-mode
   :ensure t
-  :hook ((markdown-mode . visual-line-mode)))
+  :hook (markdown-mode . visual-line-mode))
 
-(use-package yaml-mode
-  :ensure t)
-
-(use-package json-mode
-  :ensure t)
-
-(use-package lua-mode
-  :ensure t)
+(use-package yaml-mode :ensure t)
+(use-package json-mode :ensure t)
+(use-package lua-mode  :ensure t)
 
 (use-package rust-mode
   :ensure t
@@ -67,52 +58,59 @@
   (rust-format-on-save t)
   (rust-rustfmt-switches '("--edition" "2024")))
 
-(use-package compile
-  :custom
-  ;; 'first-error stops at the first error, t scrolls to the bottom always
-  (compilation-scroll-output t) 
-  
-  ;; Automatically kill old compilation processes before starting a new one
-  (compilation-always-kill t)
-  
-  ;; Skip warning and info messages when jumping to errors
-  (compilation-skip-threshold 2))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;;   Eglot, the built-in LSP client for Emacs
-;;;
+;;; LSP (EGLOT) & ELDOC
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package eglot
+  :ensure nil
   :hook
-  ((rust-mode python-mode lua-ts-mode) . eglot-ensure)
+  ((rust-mode python-ts-mode lua-ts-mode) . eglot-ensure)
   :custom
   (eglot-ignored-server-capabilities '(:inlayHintProvider))
   (eglot-send-changes-idle-time 0.5)
   (eglot-extend-to-xref t)
-  (eglot-events-buffer-size 0)
-  ;;(jsonrpc-events-buffer-size 0) 
+  (eglot-events-buffer-size 0) ;; ANTI-LAG: Disables event buffer
+  
+  ;; Rust-Analyzer specific configuration
   (eglot-workspace-configuration
-                '(:rust-analyzer (:checkOnSave (:enable t :command "clippy")
-                                  :procMacro (:enable t)
-                                  :cargo (:buildScripts (:enable t)))))
+   '(:rust-analyzer (:checkOnSave (:enable t :command "clippy")
+                     :procMacro (:enable t)
+                     :cargo (:buildScripts (:enable t)))))
   :config
+  ;; ANTI-LAG: Completely ignore JSONRPC logging for a massive performance boost
   (fset #'jsonrpc--log-event #'ignore))
 
-(with-eval-after-load 'eldoc
-  (setq eldoc-idle-delay 0.5)
-  (setq eldoc-echo-area-use-multiline-p nil))
+;; Eldoc: Built-in documentation display (used heavily by Eglot)
+(use-package eldoc
+  :ensure nil
+  :custom
+  (eldoc-idle-delay 0.5)
+  (eldoc-echo-area-use-multiline-p nil))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; COMPILATION & WINDOW MANAGEMENT
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package compile
+  :ensure nil
+  :custom
+  ;; 'first-error stops at the first error, t scrolls to the bottom always
+  (compilation-scroll-output t) 
+  ;; Automatically kill old compilation processes before starting a new one
+  (compilation-always-kill t)
+  ;; Skip warning and info messages when jumping to errors (M-g n / M-g p)
+  (compilation-skip-threshold 2))
+
+;; Force dev-related buffers to open in a side window on the right
 (add-to-list 'display-buffer-alist
              '("^\\*\\(compilation\\|cargo.*\\|rust.*\\|eldoc.*\\)\\*$"
                (display-buffer-reuse-window display-buffer-in-side-window)
                (side . right)
                (window-width . 0.4)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;;   Other useful stuffs
-;;;
+;;; OPTIONAL EXTRAS (Commented out)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Indent guideline for tree-sitter scope
@@ -128,7 +126,6 @@
 ;;    (rust-mode . (lambda ()
 ;;                   (when (treesit-available-p)
 ;;                     (treesit-parser-create 'rust))))
-;;   (lua-ts-mode . (lambda ()
+;;    (lua-ts-mode . (lambda ()
 ;;                     (when (treesit-available-p)
 ;;                       (treesit-parser-create 'lua))))))
-

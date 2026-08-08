@@ -1,16 +1,21 @@
 ;;; -*- lexical-binding: t; -*-
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; CORE & PERFORMANCE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (when (< emacs-major-version 29)
   (error "Emacs Bedrock only works with Emacs 29 and newer; you have version %s" emacs-major-version))
 
+;; Keep `.emacs.d` clean from auto-generated files
 (use-package no-littering
   :ensure t
   :demand t)
 
-;; 1. Increase read size for rust-analyzer's massive JSON responses
+;; Increase read size for rust-analyzer's massive JSON responses
 (setq read-process-output-max (* 3 1024 1024)) ;; 3 MB
 
-;; 2. Smart Garbage Collection
+;; Smart Garbage Collection (speeds up Emacs significantly)
 (use-package gcmh
   :ensure t
   :demand t
@@ -20,12 +25,7 @@
   :config
   (gcmh-mode 1))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;;   Basic settings
-;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
+;; Setup package archives
 (use-package package
   :ensure nil
   :custom
@@ -33,192 +33,85 @@
   :config
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t))
 
-(menu-bar-mode -1)
-(setopt inhibit-splash-screen t)
-(setopt initial-major-mode 'fundamental-mode)  ; default mode for the *scratch* buffer
-(setopt display-time-default-load-average nil) ; this information is useless for mostly
-(setq mode-line-collapse-minor-modes t)
-;; Automatically reread from disk if the unerlying file changes
-(setopt auto-revert-avoid-polling t)
-
-;; Some systems don't do file notifications well; see
-;; https://todo.sr.ht/~ashton314/emacs-bedrock/11
-(setopt auto-revert-interval 5)
-(setopt auto-revert-check-vc-info t)
-(global-auto-revert-mode)
-
-;; Save history of minibuffer
-(savehist-mode)
-
-;; Move through windows with Ctrl-<arrow keys>
-(windmove-default-keybindings 'control) ; You can use other modifiers here
-
-;; Fix archaic defaults
-(setopt sentence-end-double-space nil)
-
-;; Make right-click do something sensible
-(when (display-graphic-p)
-  (context-menu-mode))
-
-;; Stop Dired from opening too many buffers
-(setq dired-kill-when-opening-new-dired-buffers t)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;;   Discovery aids
-;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; which-key: shows a popup of available keybindings when typing a long key
-;; sequence (e.g. C-x ...)
-(use-package which-key
-  :ensure t
-  :config
-  (which-key-mode))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;;   Minibuffer/completion settings
-;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(setopt enable-recursive-minibuffers t)                ; Use the minibuffer whilst in the minibuffer
-(setopt completion-cycle-threshold 1)                  ; TAB cycles candidates
-(setopt completions-detailed t)                        ; Show annotations
-(setopt tab-always-indent 'complete)                   ; When I hit TAB, try to complete, otherwise, indent
-(setopt completion-styles '(basic initials substring)) ; Different styles to match input to candidates
-
-(setopt completion-auto-help 'always)                  ; Open completion always; `lazy' another option
-(setopt completions-max-height 20)                     ; This is arbitrary
-(setopt completions-format 'one-column)
-(setopt completions-group t)
-(setopt completion-auto-select 'second-tab)            ; Much more eager
-;(setopt completion-auto-select t)                     ; See `C-h v completion-auto-select' for more possible values
-
-(keymap-set minibuffer-mode-map "TAB" 'minibuffer-complete) ; TAB acts more like how it does in the shell
-
-;; For a fancier built-in completion option, try ido-mode,
-;; icomplete-vertical, or fido-mode. See also the file extras/base.el
-
-;(icomplete-vertical-mode)
-;(fido-vertical-mode)
-;(setopt icomplete-delay-completions-threshold 4000)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;;   Interface enhancements/defaults
-;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; Mode line information
-(setopt line-number-mode t)                        ; Show current line in modeline
-(setopt column-number-mode t)                      ; Show column as well
-(global-visual-line-mode 1)
-(setopt x-underline-at-descent-line nil)           ; Prettier underlines
-(setopt switch-to-buffer-obey-display-actions t)   ; Make switching buffers more consistent
-
-(setopt show-trailing-whitespace nil)      ; By default, don't underline trailing spaces
-(setopt indicate-buffer-boundaries 'left)  ; Show buffer top and bottom in the margin
-
-;; Enable horizontal scrolling
-(setopt mouse-wheel-tilt-scroll t)
-(setopt mouse-wheel-flip-direction t)
-
-(scroll-bar-mode -1)
-
-;; Disable the horizontal scroll bar (if applicable)
-(when (fboundp 'horizontal-scroll-bar-mode)
-  (horizontal-scroll-bar-mode -1))
-
-;; We won't set these, but they're good to know about
-;;
-;; (setopt indent-tabs-mode nil)
-;; (setopt tab-width 4)
-
-(blink-cursor-mode -1)                                ; Steady cursor
-(pixel-scroll-precision-mode)                         ; Smooth scrolling
-
-;; Use common keystrokes by default
-(cua-mode)
-
-;; For terminal users, make the mouse more useful
-
-(xterm-mouse-mode 1)
-
-;; Display line numbers in programming mode
-(add-hook 'prog-mode-hook 'display-line-numbers-mode)
-(setopt display-line-numbers-width 3)           ; Set a minimum width
-
-;; Nice line wrapping when working with text
-(add-hook 'text-mode-hook 'visual-line-mode)
-
-;; Modes to highlight the current line with
-(let ((hl-line-hooks '(text-mode-hook prog-mode-hook)))
-  (mapc (lambda (hook) (add-hook hook 'hl-line-mode)) hl-line-hooks))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;;   Tab-bar configuration
-;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; Show the tab-bar as soon as tab-bar functions are invoked
-(setopt tab-bar-show 1)
-
-;; Add the time to the tab-bar, if visible
-(add-to-list 'tab-bar-format 'tab-bar-format-align-right 'append)
-(add-to-list 'tab-bar-format 'tab-bar-format-global 'append)
-(setopt display-time-format "%a %F %T")
-(setopt display-time-interval 1)
-(display-time-mode)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;;   Built-in customization framework
-;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(use-package compile
-  :ensure nil
-  :custom
-  ;; Optional but highly recommended: auto-scroll the compilation buffer
-  (compilation-scroll-output t)
-  :config
-  ;; Load the built-in ansi-color package
-  (require 'ansi-color)
-  ;; Apply the color filter to the compilation buffer
-  (add-hook 'compilation-filter-hook 'ansi-color-compilation-filter))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;;   Appearance
-;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Separate custom variables file so it doesn't pollute init.el
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (when (file-exists-p custom-file)
   (load custom-file))
 
-(setq my-font-size 
-      (cond ((eq system-type 'darwin) 144) 
-            ((eq system-type 'windows-nt) 105) 
-            (t 140))) 
-(let ((my-font "FiraCode Nerd Font")) 
-  (when (find-font (font-spec :family my-font)) 
-    ;; 1. Set the default font
-    (set-face-attribute 'default nil 
-                        :family my-font
-                        :height my-font-size 
-                        :weight 'normal)
-    ;; 2. Force the fixed-pitch font (used in eldoc code blocks) to match
-    (set-face-attribute 'fixed-pitch nil 
-                        :family my-font
-                        :height my-font-size 
-                        :weight 'normal)))
-(setq-default line-spacing 0.3)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;;   Unicode & Emoji Support
-;;;
+;;; EMACS DEFAULTS & UI SETTINGS
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package emacs
+  :ensure nil
+  :custom
+  ;; 1. Basic Interface Defaults
+  (inhibit-splash-screen t)
+  (initial-major-mode 'fundamental-mode)
+  (display-time-default-load-average nil)
+  (mode-line-collapse-minor-modes t)
+  (sentence-end-double-space nil)
+  (dired-kill-when-opening-new-dired-buffers t)
+  
+  ;; 2. File & Buffer Behavior
+  (auto-revert-avoid-polling t)
+  (auto-revert-interval 5)
+  (auto-revert-check-vc-info t)
+  (switch-to-buffer-obey-display-actions t)
+
+  ;; 3. Minibuffer & Completion
+  (enable-recursive-minibuffers t)
+  (completion-cycle-threshold 1)
+  (completions-detailed t)
+  (tab-always-indent 'complete)
+  (completion-styles '(basic initials substring))
+  (completion-auto-help 'always)
+  (completions-max-height 20)
+  (completions-format 'one-column)
+  (completions-group t)
+  (completion-auto-select 'second-tab)
+
+  ;; 4. Visual Layout & Scrolling
+  (line-number-mode t)
+  (column-number-mode t)
+  (display-line-numbers-width 3)
+  (x-underline-at-descent-line nil)
+  (show-trailing-whitespace nil)
+  (indicate-buffer-boundaries 'left)
+  (mouse-wheel-tilt-scroll t)
+  (mouse-wheel-flip-direction t)
+
+  :hook
+  ;; Auto-enable modes for specific situations
+  (prog-mode . display-line-numbers-mode)
+  (text-mode . visual-line-mode)
+  (prog-mode . hl-line-mode)
+  (text-mode . hl-line-mode)
+
+  :config
+  ;; Disable UI clutter
+  (menu-bar-mode -1)
+  (scroll-bar-mode -1)
+  (blink-cursor-mode -1)
+  (when (fboundp 'horizontal-scroll-bar-mode)
+    (horizontal-scroll-bar-mode -1))
+
+  ;; Enable Core global modes
+  (savehist-mode 1)
+  (global-auto-revert-mode 1)
+  (global-visual-line-mode 1)
+  (pixel-scroll-precision-mode 1)
+  (xterm-mouse-mode 1)
+  (cua-mode 1)
+  (when (display-graphic-p)
+    (context-menu-mode 1))
+
+  ;; Bindings and Keymaps
+  (windmove-default-keybindings 'control)
+  (keymap-set minibuffer-mode-map "TAB" 'minibuffer-complete))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; FONTS, UNICODE, & APPEARANCE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Force Emacs to use UTF-8 everywhere
@@ -227,29 +120,47 @@
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
 
-;; Setup fallback fonts for Emojis and Symbols
+;; Font Configuration
+(setq-default line-spacing 0.3)
+(setq my-font-size 
+      (cond ((eq system-type 'darwin) 144) 
+            ((eq system-type 'windows-nt) 105) 
+            (t 140))) 
+
+(let ((my-font "FiraCode Nerd Font")) 
+  (when (find-font (font-spec :family my-font)) 
+    (set-face-attribute 'default nil :family my-font :height my-font-size :weight 'normal)
+    (set-face-attribute 'fixed-pitch nil :family my-font :height my-font-size :weight 'normal)))
+
+;; Emojis and Symbols
 (when (fboundp 'set-fontset-font)
-  ;; Emacs will go down this list and use the first one available on your OS
-  (let ((emoji-fonts '("Apple Color Emoji"
-                       "Noto Color Emoji"
-                       "Segoe UI Emoji"
-                       "Symbola")))
+  (let ((emoji-fonts '("Apple Color Emoji" "Noto Color Emoji" "Segoe UI Emoji" "Symbola")))
     (dolist (font emoji-fonts)
-      ;; Apply to the 'emoji and 'symbol character sets
       (set-fontset-font t 'emoji (font-spec :family font) nil 'append)
       (set-fontset-font t 'symbol (font-spec :family font) nil 'append))))
 
+;; Tab-bar configuration
+(use-package tab-bar
+  :ensure nil
+  :custom
+  (tab-bar-show 1)
+  (display-time-format "%a %F %T")
+  (display-time-interval 1)
+  :config
+  (add-to-list 'tab-bar-format 'tab-bar-format-align-right 'append)
+  (add-to-list 'tab-bar-format 'tab-bar-format-global 'append)
+  (display-time-mode 1))
+
+;; Theme Configuration
 (use-package solarized-theme
   :ensure t
   :init
-  ;; Set solarized variables BEFORE the theme loads
-  (setq solarized-use-less-bold t))
-
-(use-package emacs
+  (setq solarized-use-less-bold t)
   :config
-  (load-theme 'solarized-wombat-dark))
+  (load-theme 'solarized-wombat-dark t))
 
 (defun my-toggle-theme ()
+  "Toggle between Modus Vivendi (Dark) and Solarized (Light)."
   (interactive)
   (if (memq 'solarized-light custom-enabled-themes)
       (progn
@@ -259,43 +170,49 @@
     (progn
       (mapc #'disable-theme custom-enabled-themes)
       (load-theme 'solarized-light t)
-      (message "Switched to Solarized (Light)"))))
-(global-set-key (kbd "C-c t") 'my-toggle-theme)
+      (message "Switched to Solarized (Light)")))
+  ;; Ensure tab-bar updates properly when theme changes
+  (when (fboundp 'tab-bar-mode) (tab-bar-mode 1)))
+
+(keymap-global-set "C-c t" 'my-toggle-theme)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;;   Optional extras
-;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; UI/UX enhancements mostly focused on minibuffer and autocompletion interfaces
-;; These ones are *strongly* recommended!
-(load-file (expand-file-name "extras/base.el" user-emacs-directory))
-
-;; Packages for software development
-(load-file (expand-file-name "extras/dev.el" user-emacs-directory))
-
-;; Vim-bindings in Emacs (evil-mode configuration)
-(load-file (expand-file-name "extras/vim-like.el" user-emacs-directory))
-
-;; Org-mode configuration
-;; WARNING: need to customize things inside the elisp file before use! See
-;; the file extras/org-intro.txt for help.
-;; (load-file (expand-file-name "extras/org.el" user-emacs-directory))
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;;   Custom Keybindings
-;;;
+;;; BUILT-IN TOOLS & PACKAGES
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; Shows a popup of available keybindings when typing a long sequence
+(use-package which-key
+  :ensure t
+  :config
+  (which-key-mode 1))
+
+;; Compilation Buffer Styling
+(use-package compile
+  :ensure nil
+  :custom
+  (compilation-scroll-output t)
+  :config
+  (require 'ansi-color)
+  (add-hook 'compilation-filter-hook 'ansi-color-compilation-filter))
+
+;; Custom Config Search Function
 (defun my-search-emacs-config ()
   "Search for a file in the Emacs configuration directory using project.el."
   (interactive)
-  ;; Temporarily pretend we are inside the Emacs config directory
   (let ((default-directory user-emacs-directory))
-    ;; Call the exact same function that C-x p f uses
     (call-interactively #'project-find-file)))
 
-;; Bind it to C-c s n
 (keymap-global-set "C-c s n" #'my-search-emacs-config)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; MODULAR CONFIG (EXTRAS)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(let ((extras (list "extras/base.el"
+                    "extras/dev.el"
+                    "extras/vim-like.el"
+                    "extras/org.el")))
+  (dolist (file extras)
+    (let ((full-path (expand-file-name file user-emacs-directory)))
+      (when (file-exists-p full-path)
+        (load-file full-path)))))
