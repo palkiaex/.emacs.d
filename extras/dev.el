@@ -28,7 +28,8 @@
   :custom
   (project-mode-line (if (>= emacs-major-version 30) t nil)))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
 ;;;   Version Control
 ;;;
@@ -66,7 +67,16 @@
   (rust-format-on-save t)
   (rust-rustfmt-switches '("--edition" "2024")))
 
-(setq compilation-scroll-output 'first-error)
+(use-package compile
+  :custom
+  ;; 'first-error stops at the first error, t scrolls to the bottom always
+  (compilation-scroll-output t) 
+  
+  ;; Automatically kill old compilation processes before starting a new one
+  (compilation-always-kill t)
+  
+  ;; Skip warning and info messages when jumping to errors
+  (compilation-skip-threshold 2))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;

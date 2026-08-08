@@ -1,14 +1,14 @@
+# Ignore packages and binaries
 /.cache/
-/auto-save-list/
-/autosave/
-/eln-cache/
 /elpa/
-/eshell/
-/history
-/projects
-/transient/
+/eln-cache/
 /tree-sitter/
-/emacs-backup/
-/server/
+projects
 custom.el
-bookmarks
+*.elc
+
+# Ignore all state, cache, and history (handled by no-littering)
+/var/
+
+# Ignore auto-generated config files (handled by no-littering)
+/etc/
