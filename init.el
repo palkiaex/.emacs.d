@@ -7,6 +7,14 @@
 (when (< emacs-major-version 29)
   (error "Emacs Bedrock only works with Emacs 29 and newer; you have version %s" emacs-major-version))
 
+;; Setup package archives
+(use-package package
+  :ensure nil
+  :custom
+  (package-native-compile t)
+  :config
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t))
+
 ;; Keep `.emacs.d` clean from auto-generated files
 (use-package no-littering
   :ensure t
@@ -24,14 +32,6 @@
   (gcmh-high-cons-threshold (* 100 1024 1024))
   :config
   (gcmh-mode 1))
-
-;; Setup package archives
-(use-package package
-  :ensure nil
-  :custom
-  (package-native-compile t)
-  :config
-  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t))
 
 ;; Separate custom variables file so it doesn't pollute init.el
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
