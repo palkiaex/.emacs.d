@@ -3,7 +3,6 @@
 /elpa/
 /eln-cache/
 /tree-sitter/
-projects
 custom.el
 *.elc
 

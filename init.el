@@ -3,6 +3,10 @@
 (when (< emacs-major-version 29)
   (error "Emacs Bedrock only works with Emacs 29 and newer; you have version %s" emacs-major-version))
 
+(use-package no-littering
+  :ensure t
+  :demand t)
+
 ;; 1. Increase read size for rust-analyzer's massive JSON responses
 (setq read-process-output-max (* 3 1024 1024)) ;; 3 MB
 
@@ -295,7 +299,3 @@
 
 ;; Bind it to C-c s n
 (keymap-global-set "C-c s n" #'my-search-emacs-config)
-
-(use-package no-littering
-  :ensure t
-  :demand t)
