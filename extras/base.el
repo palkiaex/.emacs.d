@@ -36,26 +36,26 @@
 ;;; IN-BUFFER AUTOCOMPLETION (Corfu)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(use-package corfu
-  :ensure t
-  :custom
-  (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-  (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
-  (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
-  (corfu-preview-current nil)    ;; Disable current candidate preview
-  (corfu-preselect 'prompt)      ;; Preselect the prompt
-  :init
-  (global-corfu-mode)
-  (corfu-history-mode 1)
-  (corfu-popupinfo-mode 1))      ;; Shows documentation popups (replaces company-quickhelp)
-
-;; Emacs core completion settings for Corfu
-(use-package emacs
-  :ensure nil
-  :custom
-  (tab-always-indent 'complete)
-  (text-mode-ispell-word-completion nil) ;; Emacs 30+: Disable Ispell completion function
-  (read-extended-command-predicate #'command-completion-default-include-p))
+; (use-package corfu
+;   :ensure t
+;   :custom
+;   (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+;   (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
+;   (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+;   (corfu-preview-current nil)    ;; Disable current candidate preview
+;   (corfu-preselect 'prompt)      ;; Preselect the prompt
+;   :init
+;   (global-corfu-mode)
+;   (corfu-history-mode 1)
+;   (corfu-popupinfo-mode 1))      ;; Shows documentation popups (replaces company-quickhelp)
+;
+; ;; Emacs core completion settings for Corfu
+; (use-package emacs
+;   :ensure nil
+;   :custom
+;   (tab-always-indent 'complete)
+;   (text-mode-ispell-word-completion nil) ;; Emacs 30+: Disable Ispell completion function
+;   (read-extended-command-predicate #'command-completion-default-include-p))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; POWER-UPS: SEARCH & ACTIONS (Consult, Embark, Wgrep)

@@ -21,7 +21,10 @@
 
   ;; Configuring initial major mode for some modes
   (evil-set-initial-state 'eat-mode 'emacs)
-  (evil-set-initial-state 'vterm-mode 'emacs))
+  (evil-set-initial-state 'vterm-mode 'emacs)
+  (evil-set-initial-state 'shell-mode 'emacs)
+  (evil-set-initial-state 'eshell-mode 'emacs)
+  (evil-set-initial-state 'comint-mode 'emacs))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                  Visual

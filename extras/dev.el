@@ -58,6 +58,10 @@
   (rust-format-on-save t)
   (rust-rustfmt-switches '("--edition" "2024")))
 
+;; IMPORTANT: Even on Windows, use forward slashes (/) for the path!
+;; (add-to-list 'load-path "/Users/huypk/Developer/flutter-tools")
+;; (require 'flutter-tools)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; LSP (EGLOT) & ELDOC
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -70,23 +74,32 @@
   (eglot-ignored-server-capabilities '(:inlayHintProvider))
   (eglot-send-changes-idle-time 0.5)
   (eglot-extend-to-xref t)
-  (eglot-events-buffer-size 0) ;; ANTI-LAG: Disables event buffer
-  
-  ;; Rust-Analyzer specific configuration
-  (eglot-workspace-configuration
-   '(:rust-analyzer (:checkOnSave (:enable t :command "clippy")
-                     :procMacro (:enable t)
-                     :cargo (:buildScripts (:enable t)))))
+  (eglot-events-buffer-size 0)
   :config
-  ;; ANTI-LAG: Completely ignore JSONRPC logging for a massive performance boost
+  ;; Completely ignore JSONRPC logging for a massive performance boost
   (fset #'jsonrpc--log-event #'ignore))
 
-;; Eldoc: Built-in documentation display (used heavily by Eglot)
+;; Set this globally so Eglot catches it immediately when rust-analyzer starts.
+(setq-default eglot-workspace-configuration
+              '((:rust-analyzer .
+				(:check (:command "clippy" :extraArgs ["--no-deps"])
+					:procMacro (:enable t)
+					:cargo (:buildScripts (:enable t))))))
+
 (use-package eldoc
   :ensure nil
   :custom
   (eldoc-idle-delay 0.5)
-  (eldoc-echo-area-use-multiline-p nil))
+  :config
+  (defun my-eldoc-dynamic-multiline (orig-fn &rest args)
+    "Expand Eldoc to multiple lines only if there is a Flymake diagnostic at point."
+    (let ((eldoc-echo-area-use-multiline-p
+	   (if (and (bound-and-true-p flymake-mode)
+		    (flymake-diagnostics (point)))
+	       t    ;; IF ERROR AT CURSOR: Allow multi-line expansion
+	     nil))) ;; IF NO ERROR: Force 1 line for clean method signatures
+      (apply orig-fn args)))
+  (advice-add 'eldoc-display-in-echo-area :around #'my-eldoc-dynamic-multiline))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; COMPILATION & WINDOW MANAGEMENT

@@ -47,6 +47,7 @@
   :custom
   ;; 1. Basic Interface Defaults
   (inhibit-splash-screen t)
+  (ring-bell-function 'ignore)
   (initial-major-mode 'fundamental-mode)
   (display-time-default-load-average nil)
   (mode-line-collapse-minor-modes t)
