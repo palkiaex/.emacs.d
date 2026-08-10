@@ -52,6 +52,7 @@
   :ensure nil
   :custom
   ;; 1. Basic Interface Defaults
+  (use-short-answers t)
   (inhibit-splash-screen t)
   (ring-bell-function 'ignore)
   (initial-major-mode 'fundamental-mode)
