@@ -18,7 +18,13 @@
 ;; Keep `.emacs.d` clean from auto-generated files
 (use-package no-littering
   :ensure t
-  :demand t)
+  :demand t
+  :config
+  (setq auto-save-file-name-transforms
+	`((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
+  ;; Redirect backup files (file~) to a central directory
+  (setq backup-directory-alist
+	`((".*" . ,(no-littering-expand-var-file-name "backup/")))))
 
 ;; Increase read size for rust-analyzer's massive JSON responses
 (setq read-process-output-max (* 3 1024 1024)) ;; 3 MB
@@ -53,11 +59,9 @@
   (mode-line-collapse-minor-modes t)
   (sentence-end-double-space nil)
   (dired-kill-when-opening-new-dired-buffers t)
-  
+
   ;; 2. File & Buffer Behavior
-  (auto-revert-avoid-polling t)
-  (auto-revert-interval 5)
-  (auto-revert-check-vc-info t)
+  (create-lockfiles nil)
   (switch-to-buffer-obey-display-actions t)
 
   ;; 3. Minibuffer & Completion
@@ -110,6 +114,15 @@
   ;; Bindings and Keymaps
   (windmove-default-keybindings 'control)
   (keymap-set minibuffer-mode-map "TAB" 'minibuffer-complete))
+
+(use-package autorevert
+  :ensure nil
+  :custom
+  (auto-revert-avoid-polling t)
+  (auto-revert-interval 5)
+  (auto-revert-check-vc-info t)
+  :config
+  (global-auto-revert-mode 1))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; FONTS, UNICODE, & APPEARANCE

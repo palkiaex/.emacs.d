@@ -32,7 +32,7 @@
   ;; 1. Critical Variables & Paths
   ;; ---------------------------------------------------------
   (org-directory "~/Documents/org/")
-  (org-agenda-files '("inbox.org" "work.org" "trading.org"))
+  (org-agenda-files '("inbox.org" "trading.org"))
   
   ;; ---------------------------------------------------------
   ;; 2. UI & Editing Preferences
@@ -52,9 +52,9 @@
   ;; 3. Task Tracking & TODO states
   ;; ---------------------------------------------------------
   (org-todo-keywords
-   '((sequence "TODO(t)" "WAITING(w@/!)" "STARTED(s!)" "|" "DONE(d!)" "OBSOLETE(o@)")
-     (sequence "OPEN(O)" "|" "WIN(W@)" "LOSS(L@)" "BREAKEVEN(B@)"))) ; Trading states
-  
+   '((sequence "TODO( t )" "WAITING(W@/!)" "STARTED(s!)" "|" "DONE(d!)" "OBSOLETE( o@ )")
+     (sequence "OPEN(O)" "|" "WIN(w)" "LOSS(l)" "BE(b)")))
+
   ;; ---------------------------------------------------------
   ;; 4. Tags & Refiling
   ;; ---------------------------------------------------------
@@ -66,7 +66,7 @@
      (:startgroup) ("one-shot" . ?o) ("project" . ?j) ("tiny" . ?t) (:endgroup)
      ;; misc
      ("meta") ("review") ("reading")))
-     
+  
   (org-outline-path-complete-in-steps nil)
   (org-refile-use-outline-path 'file)
   ;; (org-refile-targets '((org-agenda-files . (:maxlevel . 3)))) ; Example refile target
@@ -77,13 +77,7 @@
   (org-capture-templates
    '(("c"  "Default Capture" entry (file "inbox.org") "* TODO %?\n%U\n%i")
      ("r"  "Capture with Reference" entry (file "inbox.org") "* TODO %?\n%U\n%i\n%a")
-     
-     ("w"  "Work")
-     ("wm" "Work meeting" entry (file+headline "work.org" "Meetings") "** TODO %?\n%U\n%i\n%a")
-     ("wr" "Work report" entry (file+headline "work.org" "Reports") "** TODO %?\n%U\n%i\n%a")
-     
-     ("t"  "Trading")
-     ("to" "Open Trade" entry (file+datetree "trading.org")
+     ("t" "Open Trade" entry (file+olp+datetree "trading.org")
       (file "~/Documents/org/templates/trade.txt")
       :empty-lines 1)))
 
@@ -92,12 +86,10 @@
   ;; ---------------------------------------------------------
   (org-agenda-custom-commands
    '(("n" "Agenda and All Todos" ((agenda) (todo)))
-     ("w" "Work" agenda "" ((org-agenda-files '("work.org"))))
-     ;; --- TRADING AGENDA ---
      ;; Finds only "OPEN" trades inside trading.org
      ("T" "Active Trades" tags-todo "TODO=\"OPEN\""
       ((org-agenda-files '("trading.org"))))))
-      
+  
   ;; ---------------------------------------------------------
   ;; 7. Advanced: Custom Link Types
   ;; ---------------------------------------------------------
@@ -145,3 +137,40 @@
   :custom
   (org-modern-star '("●" "○" "◈" "◇" "✳"))
   (org-modern-hide-stars t))
+
+(defun my/trade-exit-hook ()
+  "Automates trade exits: adds 'Exit on', RR property, and Post-Trade Thoughts."
+  (when (member org-state '("WIN" "LOSS" "BE"))
+    (save-excursion
+      (org-back-to-heading t)
+      
+      ;; 1. Calculate and prompt for RR
+      (let* ((default-rr (pcase org-state
+                           ("WIN" "2")
+                           ("LOSS" "-1")
+                           ("BE" "0")
+                           (_ "")))
+             (rr-input (read-string (format "RR (default %s): " default-rr)))
+             (final-rr (if (string-empty-p rr-input) default-rr rr-input))
+             
+             ;; Temporarily override Org's default spacing behavior 
+             ;; so it uses exactly 1 space instead of aligning to 10 chars.
+             (org-property-format "%s %s"))
+        
+        (unless (string-empty-p final-rr)
+          (org-set-property "RR" final-rr)))
+      
+      ;; 2. Find "Entered on:" and insert "Exit on:" directly below it
+      (goto-char (org-entry-beginning-position))
+      (when (re-search-forward "^\\s-*Entered on: .*" (save-excursion (org-end-of-subtree t) (point)) t)
+        (insert "\nExit on: " (format-time-string "<%Y-%m-%d %a %H:%M>")))
+      
+      ;; 3. Prompt for post-trade thoughts in the minibuffer
+      (let ((thoughts (read-string "Post-Trade Thoughts: ")))
+        (unless (string-empty-p thoughts)
+          (goto-char (org-entry-beginning-position))
+          (when (re-search-forward "^\\s-*Post-Trade Thoughts:" (save-excursion (org-end-of-subtree t) (point)) t)
+            (insert "\n" thoughts "\n")))))))
+
+;; Attach the function to Org-mode's state change hook (Leave this as is)
+(add-hook 'org-after-todo-state-change-hook #'my/trade-exit-hook)
