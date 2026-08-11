@@ -22,7 +22,6 @@
   :config
   (setq auto-save-file-name-transforms
 	`((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
-  ;; Redirect backup files (file~) to a central directory
   (setq backup-directory-alist
 	`((".*" . ,(no-littering-expand-var-file-name "backup/")))))
 
@@ -64,6 +63,7 @@
   ;; 2. File & Buffer Behavior
   (create-lockfiles nil)
   (switch-to-buffer-obey-display-actions t)
+  (process-adaptive-read-buffering t)
 
   ;; 3. Minibuffer & Completion
   (enable-recursive-minibuffers t)
@@ -173,23 +173,34 @@
   (setq solarized-use-less-bold t)
   :config
   (load-theme 'solarized-wombat-dark t))
-
-(defun my-toggle-theme ()
-  "Toggle between Modus Vivendi (Dark) and Solarized (Light)."
-  (interactive)
-  (if (memq 'solarized-light custom-enabled-themes)
-      (progn
-        (mapc #'disable-theme custom-enabled-themes)
-        (load-theme 'modus-vivendi t)
-        (message "Switched to Modus Vivendi (Dark)"))
-    (progn
-      (mapc #'disable-theme custom-enabled-themes)
-      (load-theme 'solarized-light t)
-      (message "Switched to Solarized (Light)")))
+(defun my-switch-theme (theme)
+  "Disable all active themes and load THEME."
+  (mapc #'disable-theme custom-enabled-themes)
+  (load-theme theme t)
   ;; Ensure tab-bar updates properly when theme changes
-  (when (fboundp 'tab-bar-mode) (tab-bar-mode 1)))
+  (when (fboundp 'tab-bar-mode) (tab-bar-mode 1))
+  (message "Switched to %s" theme))
 
-(keymap-global-set "C-c t" 'my-toggle-theme)
+;; Interactive wrappers for each theme
+(defun my-theme-modus-vivendi () 
+  "Switch to Modus Vivendi (Dark)." 
+  (interactive) (my-switch-theme 'modus-vivendi))
+
+(defun my-theme-wombat () 
+  "Switch to Solarized Wombat Dark." 
+  (interactive) (my-switch-theme 'solarized-wombat-dark))
+
+(defun my-theme-solarized-light () 
+  "Switch to Solarized Light." 
+  (interactive) (my-switch-theme 'solarized-light))
+
+(defvar-keymap my-theme-prefix-map
+  :doc "Prefix keymap for switching Emacs themes."
+  "v" #'my-theme-modus-vivendi
+  "w" #'my-theme-wombat
+  "s" #'my-theme-solarized-light)
+
+(keymap-global-set "C-c t" my-theme-prefix-map)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; BUILT-IN TOOLS & PACKAGES
