@@ -1,4 +1,5 @@
-;;; ... -- lexical-binding: t --
+;;; -*- lexical-binding: t; -*-
+
 
 ;;; Emacs Bedrock
 ;;; Extra config: Org-mode starter config

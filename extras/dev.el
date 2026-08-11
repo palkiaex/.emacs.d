@@ -58,6 +58,11 @@
   (rust-format-on-save t)
   (rust-rustfmt-switches '("--edition" "2024")))
 
+(use-package dart-mode
+  :ensure t
+  :custom
+  (dart-format-on-save t))
+
 ;; IMPORTANT: Even on Windows, use forward slashes (/) for the path!
 ;; (add-to-list 'load-path "/Users/huypk/Developer/flutter-tools")
 ;; (require 'flutter-tools)
@@ -69,9 +74,9 @@
 (use-package eglot
   :ensure nil
   :hook
-  ((rust-mode python-ts-mode lua-ts-mode) . eglot-ensure)
+  ((rust-mode python-ts-mode lua-ts-mode dart-mode) . eglot-ensure)
   :custom
-  (eglot-ignored-server-capabilities '(:inlayHintProvider))
+  (eglot-ignored-server-capabilities '(:inlayHintProvider :semanticTokensProvider))
   (eglot-send-changes-idle-time 0.5)
   (eglot-extend-to-xref t)
   (eglot-events-buffer-size 0)
@@ -89,7 +94,7 @@
 (use-package eldoc
   :ensure nil
   :custom
-  (eldoc-idle-delay 0.5)
+  (eldoc-idle-delay 1)
   :config
   (defun my-eldoc-dynamic-multiline (orig-fn &rest args)
     "Expand Eldoc to multiple lines only if there is a Flymake diagnostic at point."
