@@ -1,4 +1,4 @@
-;;; -*- lexical-binding: t -*-
+;;; dev.el -*- lexical-binding: t -*-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; CORE DEV SETTINGS & TREE-SITTER
@@ -101,12 +101,12 @@
 (use-package compile
   :ensure nil
   :custom
-  ;; 'first-error stops at the first error, t scrolls to the bottom always
   (compilation-scroll-output t) 
-  ;; Automatically kill old compilation processes before starting a new one
   (compilation-always-kill t)
-  ;; Skip warning and info messages when jumping to errors (M-g n / M-g p)
-  (compilation-skip-threshold 2))
+  (compilation-skip-threshold 2)
+  :config
+  (require 'ansi-color)
+  (add-hook 'compilation-filter-hook 'ansi-color-compilation-filter))
 
 ;; Force dev-related buffers to open in a side window on the right
 (add-to-list 'display-buffer-alist
@@ -135,3 +135,5 @@
 ;;    (lua-ts-mode . (lambda ()
 ;;                     (when (treesit-available-p)
 ;;                       (treesit-parser-create 'lua))))))
+
+(provide 'dev)

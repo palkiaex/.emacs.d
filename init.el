@@ -1,11 +1,11 @@
 ;;; -*- lexical-binding: t; -*-
 
+(when (< emacs-major-version 29)
+  (error "Emacs Bedrock only works with Emacs 29 and newer; you have version %s" emacs-major-version))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; CORE & PERFORMANCE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(when (< emacs-major-version 29)
-  (error "Emacs Bedrock only works with Emacs 29 and newer; you have version %s" emacs-major-version))
 
 ;; Setup package archives
 (use-package package
@@ -47,213 +47,20 @@
 ;;; EMACS DEFAULTS & UI SETTINGS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(use-package emacs
-  :ensure nil
-  :custom
-  ;; Basic Interface Defaults
-  (use-short-answers t)
-  (inhibit-splash-screen t)
-  (ring-bell-function 'ignore)
-  (initial-major-mode 'fundamental-mode)
-  (display-time-default-load-average nil)
-  (mode-line-collapse-minor-modes t)
-  (sentence-end-double-space nil)
-  (dired-kill-when-opening-new-dired-buffers t)
+(add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
 
-  ;; File & Buffer Behavior
-  (create-lockfiles nil)
-  (switch-to-buffer-obey-display-actions t)
-
-  ;; Minibuffer & Completion
-  (enable-recursive-minibuffers t)
-  (completion-cycle-threshold 1)
-  (completions-detailed t)
-  (tab-always-indent 'complete)
-  (completion-styles '(basic initials substring))
-  (completion-auto-help 'always)
-  (completions-max-height 20)
-  (completions-format 'one-column)
-  (completions-group t)
-  (completion-auto-select 'second-tab)
-
-  ;; Visual Layout & Scrolling
-  (line-number-mode t)
-  (column-number-mode t)
-  (display-line-numbers-width 3)
-  (x-underline-at-descent-line nil)
-  (show-trailing-whitespace nil)
-  (indicate-buffer-boundaries 'left)
-  (mouse-wheel-tilt-scroll t)
-  (mouse-wheel-flip-direction t)
-
-  :hook
-  ;; Auto-enable modes for specific situations
-  (prog-mode . display-line-numbers-mode)
-  (text-mode . visual-line-mode)
-  (prog-mode . hl-line-mode)
-  (text-mode . hl-line-mode)
-
-  :config
-  ;; Disable UI clutter
-  (menu-bar-mode -1)
-  (scroll-bar-mode -1)
-  (blink-cursor-mode -1)
-  (when (fboundp 'horizontal-scroll-bar-mode)
-    (horizontal-scroll-bar-mode -1))
-
-  ;; Enable Core global modes
-  (savehist-mode 1)
-  (global-auto-revert-mode 1)
-  (global-visual-line-mode 1)
-  (pixel-scroll-precision-mode 1)
-  (xterm-mouse-mode 1)
-  (cua-mode 1)
-  (when (display-graphic-p)
-    (context-menu-mode 1))
-
-  ;; Bindings and Keymaps
-  (windmove-default-keybindings 'control)
-  (keymap-set minibuffer-mode-map "TAB" 'minibuffer-complete))
-
-(use-package autorevert
-  :ensure nil
-  :custom
-  (auto-revert-avoid-polling t)
-  (auto-revert-interval 5)
-  (auto-revert-check-vc-info t)
-  :config
-  (global-auto-revert-mode 1))
-
-(use-package dired
-  :ensure nil
-  :hook (dired-mode . dired-hide-details-mode)
-  :custom
-  (delete-by-moving-to-trash t)
-  (auto-revert-verbose nil)
-  (global-auto-revert-non-file-buffers t))
-
-(use-package nerd-icons
-  :ensure t)
-
-(use-package nerd-icons-dired
-  :ensure t
-  :hook
-  (dired-mode . nerd-icons-dired-mode))
+(require 'my-essentials)
+(require 'my-dired)
+(require 'my-theme)
+(require 'my-utils)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; FONTS, UNICODE, & APPEARANCE
+;;; EXTRAS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Force Emacs to use UTF-8 everywhere
-(prefer-coding-system 'utf-8)
-(set-default-coding-systems 'utf-8)
-(set-terminal-coding-system 'utf-8)
-(set-keyboard-coding-system 'utf-8)
+(add-to-list 'load-path (expand-file-name "extras" user-emacs-directory))
 
-;; Font Configuration
-(setq-default line-spacing 0.3)
-(setq my-font-size 
-      (cond ((eq system-type 'darwin) 144) 
-            ((eq system-type 'windows-nt) 105) 
-            (t 140))) 
-
-(let ((my-font "FiraCode Nerd Font")) 
-  (when (find-font (font-spec :family my-font)) 
-    (set-face-attribute 'default nil :family my-font :height my-font-size :weight 'normal)
-    (set-face-attribute 'fixed-pitch nil :family my-font :height my-font-size :weight 'normal)))
-
-;; Emojis and Symbols
-(when (fboundp 'set-fontset-font)
-  (let ((emoji-fonts '("Apple Color Emoji" "Noto Color Emoji" "Segoe UI Emoji" "Symbola")))
-    (dolist (font emoji-fonts)
-      (set-fontset-font t 'emoji (font-spec :family font) nil 'append)
-      (set-fontset-font t 'symbol (font-spec :family font) nil 'append))))
-
-;; Tab-bar configuration
-(use-package tab-bar
-  :ensure nil
-  :custom
-  (tab-bar-show 1)
-  (display-time-format "%a %F %T")
-  (display-time-interval 1)
-  :config
-  (add-to-list 'tab-bar-format 'tab-bar-format-align-right 'append)
-  (add-to-list 'tab-bar-format 'tab-bar-format-global 'append)
-  (display-time-mode 1))
-
-;; Theme Configuration
-(use-package solarized-theme
-  :ensure t
-  :init
-  (setq solarized-use-less-bold t)
-  :config
-  (load-theme 'solarized-wombat-dark t))
-(defun my-switch-theme (theme)
-  "Disable all active themes and load THEME."
-  (mapc #'disable-theme custom-enabled-themes)
-  (load-theme theme t)
-  ;; Ensure tab-bar updates properly when theme changes
-  (when (fboundp 'tab-bar-mode) (tab-bar-mode 1))
-  (message "Switched to %s" theme))
-
-;; Interactive wrappers for each theme
-(defun my-theme-modus-vivendi () 
-  "Switch to Modus Vivendi (Dark)." 
-  (interactive) (my-switch-theme 'modus-vivendi))
-
-(defun my-theme-wombat () 
-  "Switch to Solarized Wombat Dark." 
-  (interactive) (my-switch-theme 'solarized-wombat-dark))
-
-(defun my-theme-solarized-light () 
-  "Switch to Solarized Light." 
-  (interactive) (my-switch-theme 'solarized-light))
-
-(defvar-keymap my-theme-prefix-map
-  :doc "Prefix keymap for switching Emacs themes."
-  "m" #'my-theme-modus-vivendi
-  "w" #'my-theme-wombat
-  "s" #'my-theme-solarized-light)
-
-(keymap-global-set "C-c t" my-theme-prefix-map)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; BUILT-IN TOOLS & PACKAGES
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; Shows a popup of available keybindings when typing a long sequence
-(use-package which-key
-  :ensure t
-  :config
-  (which-key-mode 1))
-
-;; Compilation Buffer Styling
-(use-package compile
-  :ensure nil
-  :custom
-  (compilation-scroll-output t)
-  :config
-  (require 'ansi-color)
-  (add-hook 'compilation-filter-hook 'ansi-color-compilation-filter))
-
-;; Custom Config Search Function
-(defun my-search-emacs-config ()
-  "Search for a file in the Emacs configuration directory using project.el."
-  (interactive)
-  (let ((default-directory user-emacs-directory))
-    (call-interactively #'project-find-file)))
-
-(keymap-global-set "C-c s n" #'my-search-emacs-config)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; MODULAR CONFIG (EXTRAS)
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(let ((extras (list "extras/base.el"
-                    "extras/dev.el"
-                    "extras/vim-like.el"
-                    "extras/org.el")))
-  (dolist (file extras)
-    (let ((full-path (expand-file-name file user-emacs-directory)))
-      (when (file-exists-p full-path)
-        (load-file full-path)))))
+(require 'base)
+(require 'dev)
+(require 'vim-like)
+(require 'organizer)

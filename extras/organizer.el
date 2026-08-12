@@ -1,5 +1,4 @@
-;;; -*- lexical-binding: t; -*-
-
+;;; organizer.el -*- lexical-binding: t; -*-
 
 ;;; Emacs Bedrock
 ;;; Extra config: Org-mode starter config
@@ -175,3 +174,5 @@
 
 ;; Attach the function to Org-mode's state change hook (Leave this as is)
 (add-hook 'org-after-todo-state-change-hook #'my/trade-exit-hook)
+
+(provide 'organizer)

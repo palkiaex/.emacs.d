@@ -1,4 +1,4 @@
-;;; ...  -*- lexical-binding: t -*-
+;;; vim-like.el  -*- lexical-binding: t -*-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                   Core
@@ -63,3 +63,5 @@
 (use-package flymake
   :bind (("C-c d" . flymake-show-buffer-diagnostics)
 	 ("C-c D" . flymake-show-project-diagnostics)))
+
+(provide 'vim-like)

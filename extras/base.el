@@ -1,4 +1,4 @@
-;;; -*- lexical-binding: t -*-
+;;; base.el -*- lexical-binding: t -*-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; MINIBUFFER COMPLETION (Vertico, Marginalia, Orderless)
@@ -146,3 +146,5 @@
   :config
   (eat-eshell-mode)                  ; use Eat to handle term codes in Eshell
   (eat-eshell-visual-command-mode))  ; handle interactive commands (like less, htop)
+
+(provide 'base)
