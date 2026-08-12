@@ -15,7 +15,8 @@
   :ensure nil
   :after vertico
   :bind (:map vertico-map
-              ("M-DEL" . vertico-directory-delete-word)))
+              ("M-DEL" . vertico-directory-delete-word))
+  :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
 
 ;; Marginalia: adds rich annotations (descriptions, keybindings) to minibuffer
 (use-package marginalia

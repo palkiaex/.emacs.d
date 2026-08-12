@@ -26,7 +26,7 @@
 	`((".*" . ,(no-littering-expand-var-file-name "backup/")))))
 
 ;; Increase read size for rust-analyzer's massive JSON responses
-(setq read-process-output-max (* 3 1024 1024)) ;; 3 MB
+(setq read-process-output-max (* 3 1024 1024))
 
 ;; Smart Garbage Collection (speeds up Emacs significantly)
 (use-package gcmh
@@ -50,7 +50,7 @@
 (use-package emacs
   :ensure nil
   :custom
-  ;; 1. Basic Interface Defaults
+  ;; Basic Interface Defaults
   (use-short-answers t)
   (inhibit-splash-screen t)
   (ring-bell-function 'ignore)
@@ -60,12 +60,11 @@
   (sentence-end-double-space nil)
   (dired-kill-when-opening-new-dired-buffers t)
 
-  ;; 2. File & Buffer Behavior
+  ;; File & Buffer Behavior
   (create-lockfiles nil)
   (switch-to-buffer-obey-display-actions t)
-  (process-adaptive-read-buffering t)
 
-  ;; 3. Minibuffer & Completion
+  ;; Minibuffer & Completion
   (enable-recursive-minibuffers t)
   (completion-cycle-threshold 1)
   (completions-detailed t)
@@ -77,7 +76,7 @@
   (completions-group t)
   (completion-auto-select 'second-tab)
 
-  ;; 4. Visual Layout & Scrolling
+  ;; Visual Layout & Scrolling
   (line-number-mode t)
   (column-number-mode t)
   (display-line-numbers-width 3)
@@ -124,6 +123,21 @@
   (auto-revert-check-vc-info t)
   :config
   (global-auto-revert-mode 1))
+
+(use-package dired
+  :ensure nil
+  :hook (dired-mode . dired-hide-details-mode)
+  :custom
+  (auto-revert-verbose nil)
+  (global-auto-revert-non-file-buffers t))
+
+(use-package nerd-icons
+  :ensure t)
+
+(use-package nerd-icons-dired
+  :ensure t
+  :hook
+  (dired-mode . nerd-icons-dired-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; FONTS, UNICODE, & APPEARANCE
@@ -172,7 +186,7 @@
   :init
   (setq solarized-use-less-bold t)
   :config
-  (load-theme 'solarized-wombat-dark t))
+  (load-theme 'modus-vivendi t))
 (defun my-switch-theme (theme)
   "Disable all active themes and load THEME."
   (mapc #'disable-theme custom-enabled-themes)
@@ -196,7 +210,7 @@
 
 (defvar-keymap my-theme-prefix-map
   :doc "Prefix keymap for switching Emacs themes."
-  "v" #'my-theme-modus-vivendi
+  "m" #'my-theme-modus-vivendi
   "w" #'my-theme-wombat
   "s" #'my-theme-solarized-light)
 
