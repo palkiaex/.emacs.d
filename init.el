@@ -128,6 +128,7 @@
   :ensure nil
   :hook (dired-mode . dired-hide-details-mode)
   :custom
+  (delete-by-moving-to-trash t)
   (auto-revert-verbose nil)
   (global-auto-revert-non-file-buffers t))
 
@@ -186,7 +187,7 @@
   :init
   (setq solarized-use-less-bold t)
   :config
-  (load-theme 'modus-vivendi t))
+  (load-theme 'solarized-wombat-dark t))
 (defun my-switch-theme (theme)
   "Disable all active themes and load THEME."
   (mapc #'disable-theme custom-enabled-themes)
