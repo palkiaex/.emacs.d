@@ -20,9 +20,7 @@
 
 ;; Icons for dired mode
 (use-package nerd-icons
-  :ensure t
-  :custom
-  (nerd-icons-font-family my-font))
+  :ensure t)
 
 (use-package nerd-icons-dired
   :ensure t

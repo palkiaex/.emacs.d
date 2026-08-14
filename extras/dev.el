@@ -82,9 +82,7 @@
   (eglot-ignored-server-capabilities '(:inlayHintProvider :semanticTokensProvider))
   (eglot-send-changes-idle-time 0.5)
   (eglot-extend-to-xref t)
-  (eglot-events-buffer-size 0)
   :config
-  ;; Completely ignore JSONRPC logging for a massive performance boost
   (fset #'jsonrpc--log-event #'ignore))
 
 ;; Set this globally so Eglot catches it immediately when rust-analyzer starts.
