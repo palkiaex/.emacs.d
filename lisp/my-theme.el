@@ -10,8 +10,8 @@
 (setq-default line-spacing 0.3)
 (setq my-font "FiraCode Nerd Font")
 (setq my-font-size 
-      (cond ((eq system-type 'darwin) 144) 
-            ((eq system-type 'windows-nt) 105) 
+      (cond ((eq system-type 'darwin) 140) 
+            ((eq system-type 'windows-nt) 100) 
             (t 140))) 
 
 (when (find-font (font-spec :family my-font)) 
@@ -52,7 +52,7 @@
   :init
   (setq solarized-use-less-bold t)
   :config
-  (load-theme 'solarized-wombat-dark t))
+  (load-theme 'modus-vivendi t))
 (defun my-switch-theme (theme)
   "Disable all active themes and load THEME."
   (mapc #'disable-theme custom-enabled-themes)
@@ -66,19 +66,24 @@
   "Switch to Modus Vivendi (Dark)." 
   (interactive) (my-switch-theme 'modus-vivendi))
 
+(defun my-theme-modus-operandi () 
+  "Switch to Modus Operandi (Light)." 
+  (interactive) (my-switch-theme 'modus-operandi))
+
 (defun my-theme-wombat () 
   "Switch to Solarized Wombat Dark." 
   (interactive) (my-switch-theme 'solarized-wombat-dark))
 
-(defun my-theme-solarized-light () 
+(defun my-theme-solarized-dark () 
   "Switch to Solarized Light." 
-  (interactive) (my-switch-theme 'solarized-light))
+  (interactive) (my-switch-theme 'solarized-dark))
 
 (defvar-keymap my-theme-prefix-map
   :doc "Prefix keymap for switching Emacs themes."
-  "m" #'my-theme-modus-vivendi
+  "d" #'my-theme-modus-vivendi
+  "l" #'my-theme-modus-operandi
   "w" #'my-theme-wombat
-  "s" #'my-theme-solarized-light)
+  "s" #'my-theme-solarized-dark)
 
 (keymap-global-set "C-c t" my-theme-prefix-map)
 
