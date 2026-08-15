@@ -58,6 +58,16 @@
   (rust-format-on-save t)
   (rust-rustfmt-switches '("--edition" "2024")))
 
+(use-package swift-mode
+  :ensure t
+  :custom
+  (swift-mode:basic-offset 4)
+  :hook (swift-mode . (lambda ()
+                        (add-hook 'before-save-hook 
+                                  (lambda () 
+                                    (eglot-format-buffer)) 
+                                  nil t))))
+
 (use-package dart-mode
   :ensure t
   :custom
@@ -77,13 +87,18 @@
 (use-package eglot
   :ensure nil
   :hook
-  ((rust-mode python-ts-mode lua-ts-mode dart-mode) . eglot-ensure)
+  ((rust-mode python-ts-mode lua-ts-mode dart-mode swift-mode) . eglot-ensure)
   :custom
   (eglot-ignored-server-capabilities '(:inlayHintProvider :semanticTokensProvider))
   (eglot-send-changes-idle-time 0.5)
   (eglot-extend-to-xref t)
+  (eglot-events-buffer-config '(:size 0))
   :config
-  (fset #'jsonrpc--log-event #'ignore))
+  (fset #'jsonrpc--log-event #'ignore)
+  (add-to-list 'eglot-server-programs
+               `(swift-mode . ,(if (eq system-type 'darwin)
+                                   '("xcrun" "sourcekit-lsp")
+                                 '("sourcekit-lsp")))))
 
 ;; Set this globally so Eglot catches it immediately when rust-analyzer starts.
 (setq-default eglot-workspace-configuration
@@ -91,6 +106,21 @@
 				(:check (:command "clippy" :extraArgs ["--no-deps"])
 					:procMacro (:enable t)
 					:cargo (:buildScripts (:enable t))))))
+
+(use-package eldoc
+  :ensure nil
+  :custom
+  (eldoc-idle-delay 1)
+  :config
+  (defun my-eldoc-dynamic-multiline (orig-fn &rest args)
+    "Expand Eldoc to multiple lines only if there is a Flymake diagnostic at point."
+    (let ((eldoc-echo-area-use-multiline-p
+	   (if (and (bound-and-true-p flymake-mode)
+		    (flymake-diagnostics (point)))
+	       t
+	     nil)))
+      (apply orig-fn args)))
+  (advice-add 'eldoc-display-in-echo-area :around #'my-eldoc-dynamic-multiline))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; COMPILATION & WINDOW MANAGEMENT
@@ -112,26 +142,5 @@
                (display-buffer-reuse-window display-buffer-in-side-window)
                (side . right)
                (window-width . 0.4)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; OPTIONAL EXTRAS (Commented out)
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; Indent guideline for tree-sitter scope
-;; (use-package indent-bars
-;;   :ensure t
-;;   :custom
-;;   (indent-bars-highlight-current-depth nil)
-;;   (indent-bars-treesit-support t)
-;;   (indent-bars-treesit-scope '((rust function_item impl_item trait_item struct_item enum_item block)))
-;;   (indent-bars-prefer-character (eq system-type 'darwin))
-;;   :hook 
-;;   ((rust-mode . indent-bars-mode)
-;;    (rust-mode . (lambda ()
-;;                   (when (treesit-available-p)
-;;                     (treesit-parser-create 'rust))))
-;;    (lua-ts-mode . (lambda ()
-;;                     (when (treesit-available-p)
-;;                       (treesit-parser-create 'lua))))))
 
 (provide 'dev)
