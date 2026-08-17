@@ -30,12 +30,13 @@
   :custom
   (completion-styles '(orderless basic))
   (completion-category-overrides '((file (styles partial-completion))))
-  (completion-category-defaults nil)   ;; Disable defaults, use our settings
-  (completion-pcm-leading-wildcard t) ;; Emacs 31: partial-completion behaves like substring
-  (orderless-matching-styles '(orderless-literal 
-                               orderless-regexp 
-                               orderless-initialism 
-                               orderless-flex)))
+  (completion-pcm-leading-wildcard t))
+
+;; Persist history over Emacs restarts. Vertico sorts by history position!
+(use-package savehist
+  :ensure nil
+  :init
+  (savehist-mode 1))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; IN-BUFFER AUTOCOMPLETION (Corfu)
