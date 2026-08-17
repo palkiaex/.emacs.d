@@ -3,6 +3,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; CORE DEV SETTINGS & TREE-SITTER
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(setq-default tab-width 4)
+(setq-default indent-tabs-mode nil)
 
 (use-package emacs
   :ensure nil
@@ -63,6 +65,11 @@
   :custom
   (swift-mode:basic-offset 4)
   :hook (swift-mode . (lambda ()
+                        ;; Enable Semantic Tokens locally for Swift to get compiler-accurate 
+                        ;; highlighting (since we don't have a swift-ts-mode)
+                        (setq-local eglot-ignored-server-capabilities '(:inlayHintProvider))
+                        
+                        ;; Format on save
                         (add-hook 'before-save-hook 
                                   (lambda () 
                                     (eglot-format-buffer)) 

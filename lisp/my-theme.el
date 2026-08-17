@@ -8,9 +8,9 @@
 
 ;; Font Configuration
 (setq-default line-spacing 0.3)
-(setq my-font "FiraCode Nerd Font")
+(setq my-font "JetBrainsMono NF")
 (setq my-font-size 
-      (cond ((eq system-type 'darwin) 140) 
+      (cond ((eq system-type 'darwin) 135) 
             ((eq system-type 'windows-nt) 100) 
             (t 140))) 
 
@@ -88,3 +88,4 @@
 (keymap-global-set "C-c t" my-theme-prefix-map)
 
 (provide 'my-theme)
+
