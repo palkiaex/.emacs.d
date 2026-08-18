@@ -68,7 +68,6 @@
                         ;; Enable Semantic Tokens locally for Swift to get compiler-accurate 
                         ;; highlighting (since we don't have a swift-ts-mode)
                         (setq-local eglot-ignored-server-capabilities '(:inlayHintProvider))
-                        
                         ;; Format on save
                         (add-hook 'before-save-hook 
                                   (lambda () 

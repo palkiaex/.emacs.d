@@ -70,9 +70,9 @@
   "Switch to Modus Operandi (Light)." 
   (interactive) (my-switch-theme 'modus-operandi))
 
-(defun my-theme-wombat () 
-  "Switch to Solarized Wombat Dark." 
-  (interactive) (my-switch-theme 'solarized-wombat-dark))
+(defun my-theme-ef-elea-dark () 
+  "Switch to ef-elea-dark." 
+  (interactive) (my-switch-theme 'ef-elea-dark))
 
 (defun my-theme-solarized-dark () 
   "Switch to Solarized Light." 
@@ -82,7 +82,7 @@
   :doc "Prefix keymap for switching Emacs themes."
   "d" #'my-theme-modus-vivendi
   "l" #'my-theme-modus-operandi
-  "w" #'my-theme-wombat
+  "w" #'my-theme-ef-elea-dark
   "s" #'my-theme-solarized-dark)
 
 (keymap-global-set "C-c t" my-theme-prefix-map)
